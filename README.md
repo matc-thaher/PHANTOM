@@ -1,6 +1,10 @@
 # PHANTOM
-PHANTOM
-Profile and Halo Analysis for Numerous Theoretical dark Matter Observables
+
+**P**rofile and **H**alo **A**nalysis for **N**umerous **T**heoretical dark **M**atter **O**bservables
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![MATLAB](https://img.shields.io/badge/MATLAB-R2020a%2B-blue.svg)](https://www.mathworks.com)
+[![DOI](https://zenodo.org/badge/1214330711.svg)](https://doi.org/10.5281/zenodo.19700919)
 
 
 
@@ -66,12 +70,29 @@ run_all_tests
 
 All tests use the MATLAB unit testing framework. Output shows pass/fail for each module.
  
-Citation
+## Citation
+
 If you use PHANTOM in your research, please cite the software paper:
-Chowdhury, Mohammad Abu Thaher. (2026). PHANTOM: Profile and Halo Analysis for Numerous Theoretical dark Matter Observables. [in preperation]
+
+Chowdhury, Mohammad Abu Thaher. (2026). *PHANTOM: Profile and Halo Analysis for
+Numerous Theoretical dark Matter Observables*. Zenodo.
+https://doi.org/10.5281/zenodo.XXXXXXX
+
+```bibtex
+@software{chowdhury_2026_phantom,
+  author    = {Chowdhury, Mohammad Abu Thaher},
+  title     = {PHANTOM: Profile and Halo Analysis for Numerous
+               Theoretical dark Matter Observables},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.19700919},
+  url       = {https://doi.org/10.5281/zenodo.19700919}
+}
+```
+
 For the core-halo mass relation introduced in this package, also cite:
-Thaher, Mohammad Abu Thaher et al. (in prep.). [Core-halo mass relation paper title].
-BibTeX entries are provided in CITATION.cff.
+
+> Chowdhury, Mohammad Abu Thaher et al. (in prep.). [Core-halo mass relation paper title].
  
 Related Papers Implemented
 •	Schive, H.-Y., Chiueh, T., & Broadhurst, T. (2014). Cosmic structure as the quantum interference of a coherent dark wave. Nature Physics, 10, 496–499.
