@@ -1,0 +1,79 @@
+cff-version: 1.2.0
+message: "If you use PHANTOM in your research, please cite it using the metadata below."
+type: software
+title: "PHANTOM: Profile and Halo Analysis for Numerous Theoretical dark Matter Observables"
+abstract: >
+  PHANTOM is a MATLAB toolbox for computing dark matter halo properties across
+  multiple dark matter models, including CDM, WDM, and fuzzy dark matter (FDM).
+  It provides NFW and Einasto density profiles, concentration-mass relations,
+  suppression transfer functions, and FDM soliton core-halo mass relations
+  (Schive et al., Mocz et al., and Thaher et al.).
+authors:
+  - family-names: Thaher
+    given-names: "Mohammad Abu Thaher"
+    affiliation: "Rensselaer Polytechnic Institute / Department of Physics, Applied Physics, And Astronomy"
+    orcid: "https://orcid.org/0000-0002-7578-6832"
+repository-code: "https://github.com/matc-thaher/PHANTOM"
+license: MIT
+version: "1.0.0"
+date-released: "2026-04-22"
+keywords:
+  - dark matter
+  - fuzzy dark matter
+  - NFW profile
+  - halo concentration
+  - core-halo mass relation
+  - soliton
+  - astrophysics
+  - MATLAB
+  - cosmology
+references:
+  - type: article
+    authors:
+      - family-names: Schive
+        given-names: Hsi-Yu
+      - family-names: Chiueh
+        given-names: Tzihong
+      - family-names: Broadhurst
+        given-names: Tom
+    title: "Cosmic Structure as the Quantum Interference of a Coherent Dark Wave"
+    journal: "Nature Physics"
+    volume: 10
+    year: 2014
+    pages: "496-499"
+    doi: "10.1038/nphys2996"
+  - type: article
+    authors:
+      - family-names: Mocz
+        given-names: Philip
+    title: "Galaxy Formation with BECDM"
+    journal: "Monthly Notices of the Royal Astronomical Society"
+    volume: 471
+    year: 2017
+    pages: "4559-4570"
+    doi: "10.1093/mnras/stx1887"
+  - type: article
+    authors:
+      - family-names: Navarro
+        given-names: Julio F.
+      - family-names: Frenk
+        given-names: Carlos S.
+      - family-names: White
+        given-names: Simon D. M.
+    title: "A Universal Density Profile from Hierarchical Clustering"
+    journal: "The Astrophysical Journal"
+    volume: 490
+    year: 1997
+    pages: "493-508"
+    doi: "10.1086/304888"
+  - type: article
+    authors:
+      - family-names: Diemer
+        given-names: Benedikt
+      - family-names: Kravtsov
+        given-names: Andrey V.
+    title: "A Universal Model for Halo Concentrations"
+    journal: "The Astrophysical Journal"
+    volume: 799
+    year: 2015
+    doi: "10.1088/0004-637X/799/1/108"
