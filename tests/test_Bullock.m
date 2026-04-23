@@ -12,7 +12,7 @@
 %   >> cd /path/to/repo
 %   >> test_Bullock01_concentration
 
-clear; clc; close all;
+%clear; clc; close all;
 
 %% =========================================================================
 % 0. Add paths

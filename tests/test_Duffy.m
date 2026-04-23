@@ -14,7 +14,7 @@
 %   7. Custom pivot mass warning and rescaling check
 %   8. Plots
 
-clear; clc; close all;
+%clear; clc; close all;
 
 %% =========================================================================
 % 0. Paths

@@ -15,7 +15,7 @@
 %   9. Subhalo > distinct at same mass (tidal stripping effect)
 %  10. Plots: c(M) at all tabulated z + subhalo vs distinct at z=0
 
-clear; clc; close all;
+% clear; clc; close all;
 
 %% =========================================================================
 % 0. Paths
@@ -96,9 +96,9 @@ P_z0   = Klypin11_Table('distinct');
 for M = M_test
     c_eq10 = 9.60 * (M / 1e12)^(-0.075);
     c_eq12 = Klypin11(M, 0, 'distinct');
-    diff   = 100 * abs(c_eq12 - c_eq10) / c_eq10;
+    diff1   = 100 * abs(c_eq12 - c_eq10) / c_eq10;
     fprintf('  M=1e%.0f:  Eq10=%.4f  Eq12=%.4f  diff=%.3f%%\n', ...
-        log10(M), c_eq10, c_eq12, diff);
+        log10(M), c_eq10, c_eq12, diff1);
 end
 
 %% =========================================================================

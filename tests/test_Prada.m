@@ -14,7 +14,7 @@
 %   8. Bolshoi x0_norm reproduces 1.393
 %   9. Plots: c(M) at multiple z + c(z) at fixed masses
 
-clear; clc; close all;
+% clear; clc; close all;
 
 %% =========================================================================
 % 0. Paths

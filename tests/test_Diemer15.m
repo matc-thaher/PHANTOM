@@ -13,7 +13,7 @@
 %   9. Mean > median at low nu, median > mean at high nu (crossover)
 %  10. Plausible c200c range at z=0
 
-clc; close; clear all; 
+%clc; close; clear all; 
 
 fprintf('=== test_Diemer15 ===\n\n');
 
@@ -82,11 +82,11 @@ for stat = {'median', 'mean'}
     fprintf('\n  statistic = %s:\n', stat{1});
     for fi = 1:numel(required)
         got = P.(required{fi});
-        exp = ref.(required{fi});
-        d   = abs(got - exp);
+        exp1 = ref.(required{fi});
+        d   = abs(got - exp1);
         ok  = d < tol_tight;
         fprintf('    %-8s : got=%.4f  expected=%.4f  diff=%.2e  %s\n', ...
-            required{fi}, got, exp, d, tfstr(ok));
+            required{fi}, got, exp1, d, tfstr(ok));
         assert(ok, 'Parameter %s mismatch for statistic=%s', required{fi}, stat{1});
     end
 end

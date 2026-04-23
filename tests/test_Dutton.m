@@ -16,7 +16,7 @@
 %   10. Custom M_pivot changes result but not at M=M_pivot
 %   11. Plots: c(M) at multiple z + c(z) at fixed masses
 
-clear; clc; close all;
+% clear; clc; close all;
 
 %% =========================================================================
 % 0. Paths
@@ -73,7 +73,7 @@ fprintf('\n--- a(z=0) = a1 check ---\n');
 
 for i = 1:numel(mdefs)
     P  = Dutton14_Table(mdefs{i});
-    az0 = P.a0 + (P.a1 - P.a0) .* exp(-P.eta .* 0.^P.phi);
+    az0 = P.a0 + (P.a1 - P.a0) .* exp(-P.eta .* (0).^P.phi);
     fprintf('  %s: a(z=0) = %.6f  a1 = %.6f  diff = %.2e  %s\n', ...
         mdefs{i}, az0, P.a1, abs(az0 - P.a1), tfstr(abs(az0 - P.a1) < 1e-10));
     assert(abs(az0 - P.a1) < 1e-10, 'a(z=0) != a1 for mdef=%s', mdefs{i});

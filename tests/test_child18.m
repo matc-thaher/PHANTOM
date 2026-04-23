@@ -2,7 +2,7 @@
 % Test suite for Child18_concentration.m
 % Reference: Child et al. 2018, ApJ 859 55
 
-clear; clc; close all;
+%clear; clc; close all;
 
 fprintf('========================================\n');
 fprintf('  Child18 concentration test suite\n');

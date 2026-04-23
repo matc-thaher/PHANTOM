@@ -12,7 +12,7 @@
 %   Soliton_profile.m
 %   DK14_profile.m
 
-clear; clc; close all;
+% clear; clc; close all;
 
 here     = fileparts(mfilename('fullpath'));
 repo     = fullfile(here, '..');

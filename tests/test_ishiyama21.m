@@ -1,7 +1,7 @@
 % test_Ishiyama21.m
 % Test suite for Ishiyama21_concentration.m
 % Reference: Ishiyama et al. 2021, MNRAS 506, 4210, Table 2 / Appendix B
-clear; clc; close all;
+% clear; clc; close all;
 
 %% =========================================================================
 % 0. Paths
