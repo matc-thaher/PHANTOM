@@ -119,7 +119,7 @@ If you use PHANTOM in your research, please cite the software paper:
 
 Chowdhury, Mohammad Abu Thaher. (2026). *PHANTOM: Profile and Halo Analysis for
 Numerous Theoretical dark Matter Observables*. Zenodo.
-[https://doi.org/10.5281/zenodo.XXXXXXX](https://doi.org/10.5281/zenodo.19700919)
+[https://doi.org/10.5281/zenodo.19700919](https://doi.org/10.5281/zenodo.19700919)
 
 ```bibtex
 @software{chowdhury_2026_phantom,
