@@ -1,0 +1,25 @@
+name: Publish Wiki
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - docs/**                          # only runs when docs/ changes
+      - .github/workflows/publish-wiki.yml
+
+concurrency:
+  group: publish-wiki
+  cancel-in-progress: true
+
+permissions:
+  contents: write                        # required to push to the wiki
+
+jobs:
+  publish-wiki:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: Andrew-Chen-Wang/github-wiki-action@v5
+        with:
+          path: docs/wiki/               # folder in your repo with the .md files
