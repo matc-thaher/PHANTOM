@@ -139,7 +139,7 @@ All tests use the MATLAB unit testing framework. Output shows pass/fail for each
 |---|---|
 | [Installation](Installation) | Clone, path setup, and `.mltbx` install option |
 | [Halo Profiles](Halo-Profile) | NFW, Einasto, Soliton, Hernquist — function list and usage |
-| [Concentration Relations](Concentration-Relations) | All supported concentration–mass models |
+| [Concentrations](Concentration) | All supported concentration–mass models |
 | [FDM Soliton Physics](FDM-Soliton) | Soliton profile and core-halo mass relations |
 | [Suppression Functions](Suppression-Functions) | WDM and FDM transfer functions |
 | [Cosmological Utilities](Cosmological-Utilities) | Critical density, R200, Rvir |
