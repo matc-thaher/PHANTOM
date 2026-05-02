@@ -4,7 +4,9 @@
 
 ---
 
-**Halo Profiles**
+<details>
+<summary><b>Halo Profiles</b></summary>
+
 - [Overview](Halo-Profile)
 - [NFW Profile](NFW_profile)
 - [NFW Analytical Profile](NFW_analytcl-Profile)
@@ -13,12 +15,22 @@
 - [DK14 Profile](DK14_profile)
 - [Soliton Profile](Soliton_profile)
 
----
-
-**Concentration**
-- [Coming soon]
+</details>
 
 ---
 
-**Utilities**
+<details>
+<summary><b>Concentration</b></summary>
+
 - [Coming soon]
+
+</details>
+
+---
+
+<details>
+<summary><b>Utilities</b></summary>
+
+- [Coming soon]
+
+</details>
