@@ -6,7 +6,7 @@
         Ob = cosmo.Omega_b;
         h  = cosmo.h;
 
-        theta = 2.7/2.7;
+        theta = 2.7255/2.7;
 
         s = 44.5*log(9.83./(Om*h.^2)) ./ sqrt(1 + 10*(Ob*h.^2).^(3/4));
 
@@ -16,7 +16,7 @@
         Gamma_eff = Om*h * (alpha_gamma + ...
                    (1 - alpha_gamma) ./ (1 + (0.43*k*s).^4));
 
-        q = k .* theta.^2 ./ (Gamma_eff .* h);
+        q = k .* theta.^2 ./ Gamma_eff;
 
         L0 = log(2*exp(1) + 1.8*q);
         C0 = 14.2 + 731./(1 + 62.5*q);
@@ -24,4 +24,5 @@
         T0 = L0 ./ (L0 + C0.*q.^2);
 
         T = T0;
+        
     end

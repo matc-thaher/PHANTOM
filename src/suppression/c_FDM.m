@@ -106,17 +106,34 @@ function [c_fdm, M_half] = c_FDM(M, z, m_ax, varargin)
 simple_models = { 'duffy08', 'd08', ...
                  'klypin11',  'k11', 'dutton14', 'dm14'};
 
+% % --- suppression model (arg 1) ---
+% if numel(varargin) >= 1 && ischar(varargin{1}) && ...
+%         any(strcmpi(varargin{1}, {'laroche2022','dentler2022'}))
+%     sup_model = varargin{1};
+%     varargin  = varargin(2:end);          % consume
+% else
+%     sup_model = 'laroche2022';            % default
+% end
+% 
+% % --- CDM model (arg 2, now arg 1 of remaining) ---
+% if numel(varargin) >= 1 && ischar(varargin{1}) && ...
+%         ~isstruct(varargin{1})
+%     cdm_model = varargin{1};
+%     varargin  = varargin(2:end);          % consume
+% else
+%     cdm_model = 'ishiyama21';             % default
+% end
+
 % --- suppression model (arg 1) ---
-if numel(varargin) >= 1 && ischar(varargin{1}) && ...
+if numel(varargin) >= 1 && (ischar(varargin{1}) || isstring(varargin{1})) && ...
         any(strcmpi(varargin{1}, {'laroche2022','dentler2022'}))
     sup_model = varargin{1};
     varargin  = varargin(2:end);          % consume
 else
     sup_model = 'laroche2022';            % default
 end
-
 % --- CDM model (arg 2, now arg 1 of remaining) ---
-if numel(varargin) >= 1 && ischar(varargin{1}) && ...
+if numel(varargin) >= 1 && (ischar(varargin{1}) || isstring(varargin{1})) && ...
         ~isstruct(varargin{1})
     cdm_model = varargin{1};
     varargin  = varargin(2:end);          % consume
@@ -128,20 +145,20 @@ end
 %   cosmo (struct) and/or mode (char), exactly matching c_CDM's signature.
 % For simple models (no cosmo), varargin may be empty or contain only mode.
 % Validate that physics-based models received a cosmo struct.
-needs_cosmo = ~any(strcmpi(cdm_model, simple_models));
-if needs_cosmo && (isempty(varargin) || ~isstruct(varargin{1}))
-    error(['c_FDM: CDM model "%s" requires a cosmo struct as input.\n' ...
-           'Call: c_FDM(M, z, m_ax, sup_model, ''%s'', cosmo) ' ...
-           'or c_FDM(M, z, m_ax, sup_model, ''%s'', cosmo, mode).'], ...
-           cdm_model, cdm_model, cdm_model);
-end
+% needs_cosmo = ~any(strcmpi(cdm_model, simple_models));
+% if needs_cosmo && (isempty(varargin) || ~isstruct(varargin{1}))
+%     error(['c_FDM: CDM model "%s" requires a cosmo struct as input.\n' ...
+%            'Call: c_FDM(M, z, m_ax, sup_model, ''%s'', cosmo) ' ...
+%            'or c_FDM(M, z, m_ax, sup_model, ''%s'', cosmo, mode).'], ...
+%            cdm_model, cdm_model, cdm_model);
+% end
 
 % -------------------------------------------------------------------------
 % Compute M_half from boson mass
 %   M_half = 3.8e10 * m22^(-4/3)  [M_sun]
 %   where m22 = m_ax / 1e-22 eV
 % -------------------------------------------------------------------------
-m22    = m_ax / 1e-22;
+m22    = m_ax ; %/ 1e-22;
 M_half = 3.8e10 * m22^(-4/3);           % [M_sun]
 
 % -------------------------------------------------------------------------

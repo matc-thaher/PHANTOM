@@ -12,6 +12,7 @@ function neff = neff( M,z,kappa, cosmo)
         sig_p = cosmo.sigmaR(Rp, z);
         sig_m = cosmo.sigmaR(Rm, z);
 
-        dlnsigma = log(sig_p ./ sig_m) ./ (2*log(1+d));
+        dlnsigma = log(sig_p ./ sig_m) ./ (log(1+d)-log(1-d));
         neff = -3 - 2 * dlnsigma;
+       
     end

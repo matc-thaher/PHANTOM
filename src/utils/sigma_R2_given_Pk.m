@@ -7,19 +7,19 @@
     % Pk_handle  : function handle for P(k) at z=0 (unnormalized or unit)
 
         % k-grid for integration
-        k = logspace(-4, 2, 2000);  % h/Mpc
-
-        % x = k*R
-        x = k .* R;
-
+        lnk = linspace(log(1e-6), log(1e4), 4000).';   % log-spaced, wider range
+        k   = exp(lnk);
+    
         % Fourier-space top-hat window function
-        W = 3 * ( sin(x) - x.*cos(x) ) ./ (x.^3 + (x==0));
-
+        x   = k .* R;
+        W   = 3*(sin(x) - x.*cos(x)) ./ (x.^3 + (x==0));
+    
         % Apply growth factor if needed
-        D = cosmo.D(z) / cosmo.D(0);
-        Pk = Pk_handle(k) * D^2;
-
+        D   = cosmo.D(z) / cosmo.D(0);
+        Pk  = Pk_handle(k(:)) * D^2;
+    
         % Compute sigma^2
-        integrand = k.^2 .* Pk .* (W.^2);
-        s2 = (1/(2*pi^2)) * trapz(k, integrand);
-    end
+        integrand = Pk .* W.^2 .* k.^3;   % k^3 for d(lnk) — NOT k^2 dk
+        s2  = (1/(2*pi^2)) * trapz(lnk, integrand);
+
+end
