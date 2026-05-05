@@ -24,7 +24,7 @@ function [conc_interp, lhs_min_interp, lhs_max_interp] = build_lhs_table(profile
     prof_dir = fullfile(this_dir, '..', 'profiles');
     addpath(prof_dir);
 
-    % --- grid sizes (match Colossus) ---
+    % --- grid sizes ---
     n_G = 80;  n_n = 40;  n_c = 80;
     n     = linspace(-4.0, 0.0, n_n);      % 1 x n_n
     c_log = linspace(-1.0, 3.0, n_c);      % 1 x n_c  log10(c)
@@ -33,7 +33,7 @@ function [conc_interp, lhs_min_interp, lhs_max_interp] = build_lhs_table(profile
     % --- mu(c) called directly from PHANTOM profile functions ---
     mu = profile_mu(c, profile_name);       % 1 x n_c
 
-    % --- IMPROVEMENT (d): vectorized lhs via implicit expansion, no loop over n ---
+    % --- vectorized lhs via implicit expansion, no loop over n ---
     exponents = (5 + n) / 6;                               % 1 x n_n
     lhs = log10( c(:) ./ (mu(:).^exponents) );             % n_c x n_n
 
@@ -55,7 +55,7 @@ function [conc_interp, lhs_min_interp, lhs_max_interp] = build_lhs_table(profile
         lhs_j = lhs(m, j);                                  % ascending column
         c_j   = c_log(m)';                                  % log10(c), column
 
-        % IMPROVEMENT (a): lhs_j is ascending after masking -> first/last = min/max
+        % lhs_j is ascending after masking -> first/last = min/max
         mins(j) = lhs_j(1);
         maxs(j) = lhs_j(end);
 
@@ -63,7 +63,7 @@ function [conc_interp, lhs_min_interp, lhs_max_interp] = build_lhs_table(profile
         lhs_valid = lhs_grid(maskG);
         c_valid   = interp1(lhs_j, c_j, lhs_valid, 'linear', 'extrap');
 
-        % IMPROVEMENT (c): pre-fill column then overwrite — removes mask_low/mask_high
+        % pre-fill column then overwrite — removes mask_low/mask_high
         log10c_table(:, j)                  = c_j(1);
         log10c_table(maskG, j)              = c_valid(:);
         log10c_table(lhs_grid > maxs(j), j) = c_j(end);
