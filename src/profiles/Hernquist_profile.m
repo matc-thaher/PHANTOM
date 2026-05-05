@@ -1,7 +1,7 @@
-function [rho, rhos, rs] = Hernquist_profile(r, M, c, z, cosmo, Delta)
+function [rho, rhos, rs, fc] = Hernquist_profile(r, M, c, z, cosmo, Delta)
 % Hernquist_profile  Hernquist (1990) density profile
 %
-%   [rho, rhos, rs] = Hernquist_profile(r, M, c, z, cosmo, Delta)
+%   [rho, rhos, rs, fc] = Hernquist_profile(r, M, c, z, cosmo, Delta)
 %
 %   INPUTS
 %   r      : radii [Mpc/h], scalar or vector
@@ -15,6 +15,7 @@ function [rho, rhos, rs] = Hernquist_profile(r, M, c, z, cosmo, Delta)
 %   rho    : density [Msun/h / (Mpc/h)^3]
 %   rhos   : characteristic density [same units]
 %   rs     : scale radius [Mpc/h]
+%   fc     : concentration-dependent factor
 %
 %   Profile form:
 %     rho(r) = rhos / [ (r/rs) * (1 + r/rs)^3 ]

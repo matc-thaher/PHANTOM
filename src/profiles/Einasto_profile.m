@@ -1,4 +1,4 @@
-function [rho, rhos, rs] = Einasto_profile(r, M, c, z, cosmo, Delta)
+function [rho, rhos, rs, fc] = Einasto_profile(r, M, c, z, cosmo, Delta)
 % Einasto_profile  Einasto (1965) density profile with alpha_e from Gao+2008
 %
 %   [rho, rhos, rs] = Einasto_profile(r, M, c, z, cosmo, Delta)
@@ -33,6 +33,8 @@ function [rho, rhos, rs] = Einasto_profile(r, M, c, z, cosmo, Delta)
 %   rho     : density profile at r [Msun/h / (Mpc/h)^3]
 %   rhos    : density at scale radius rs [same units]
 %   rs      : scale radius [Mpc/h]
+%   fc     : concentration-dependent factor
+%
 %
 %   Profile form:
 %     rho(r) = rhos * exp( -(2/alpha_e) * [ (r/rs)^alpha_e - 1 ] )
@@ -69,6 +71,7 @@ function [rho, rhos, rs] = Einasto_profile(r, M, c, z, cosmo, Delta)
     x_edge  = hn .* c.^alpha_e;                     % argument at R_Delta
     Ig      = gammainc(x_edge, 3./alpha_e) ...
               .* gamma(3./alpha_e);                  % lower incomplete gamma * Gamma
+    fc      = Ig;
     rhos    = M ./ (4.*pi .* rs.^3 ...
               .* exp(hn) ./ alpha_e ...
               .* hn.^(-3./alpha_e) .* Ig);
