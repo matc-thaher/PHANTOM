@@ -33,12 +33,14 @@
                 error('Unknown cosmology "%s"', name);
         end
         
-        
         cosmo.Omega_L   = 1 - cosmo.Omega_m;
-        cosmo.rho_crit0 = 2.8e11*(cosmo.h)^2;
-        cosmo.rho_m0    = cosmo.rho_crit0 * cosmo.Omega_m;
+        cosmo.rho_crit0 = 2.775e11;
+        cosmo.rho_m0    = cosmo.rho_crit0 * cosmo.Omega_m; 
 
         % Attach all linear components
-        cosmo = attach_linear_components( cosmo);
+        cosmo = attach_linear_components( cosmo);   
 
+        % update rho critical with z
+        cosmo.rhocrit   = @(z) cosmo.rho_crit0 .* cosmo.E(z).^2;
+             
     end

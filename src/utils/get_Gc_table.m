@@ -1,94 +1,3 @@
-% function [Gc_interp, Gmin_interp, Gmax_interp] = get_Gc_table(profile)
-%     % profile: 'nfw' only for now
-% 
-%     persistent cache
-%     if ~isempty(cache) && isfield(cache, profile)
-%         s = cache.(profile);
-%         Gc_interp   = s.Gc_interp;
-%         Gmin_interp = s.Gmin_interp;
-%         Gmax_interp = s.Gmax_interp;
-%         return;
-%     end
-% 
-%     % Parameters matching Colossus defaults
-%     n_G = 80;  n_n = 40;  n_c = 80;
-%     n = linspace(-4.0, 0.0, n_n);
-%     c_log = linspace(-1.0, 3.0, n_c);   % log10 c
-%     c = 10.^c_log;
-% 
-%     % Profile-dependent mu(c)
-%     % For Ishiyama/Diemer19 we only need NFW:
-%     mu = NFW_mu(c);    % same as Colossus NFWProfile.mu(c)
-% 
-%     % lhs = log10( c / mu^{(5+n)/6} )
-%     lhs = zeros(n_c, n_n);
-%     for j = 1:n_n
-%         lhs(:, j) = log10( c ./ (mu'.^((5 + n(j))/6)) );
-%     end
-% 
-%     % Enforce monotonic ascending region in c for each n
-%     mask_ascending = true(size(lhs));
-%     mask_ascending(1:end-1, :) = diff(lhs, 1, 1) > 0;
-% 
-%     G_min = min(lhs(:));
-%     G_max = max(lhs(:));
-%     G = linspace(G_min, G_max, n_G);
-% 
-%     gc_table = -10*ones(n_G, n_n);
-%     mins = zeros(1, n_n);
-%     maxs = zeros(1, n_n);
-% 
-%     for j = 1:n_n
-%         m = mask_ascending(:, j);
-%         lhs_j = lhs(m, j);
-%         c_j   = c_log(m);      % still log10(c)
-% 
-%         mins(j) = min(lhs_j);
-%         maxs(j) = max(lhs_j);
-% 
-%         % c(G) interpolation in log10 space
-%         % Use interp1 as a stand-in for Colossus' spline
-%         G_valid = G(G >= mins(j) & G <= maxs(j));
-%         c_valid = interp1(lhs_j, c_j, G_valid, 'linear', 'extrap');
-% 
-%         % Fill gc_table
-%         mask_valid = (G >= mins(j) & G <= maxs(j));
-%         gc_table(mask_valid, j) = c_valid;
-% 
-%         mask_low  = (G < mins(j));
-%         mask_high = (G > maxs(j));
-%         gc_table(mask_low, j)  = min(c_valid);
-%         gc_table(mask_high, j) = max(c_valid);
-%     end
-% 
-%     % Build 2D interpolator: log10 c = f(G, n)
-%     % Use griddedInterpolant on (G, n)
-%     [G_grid, n_grid] = ndgrid(G, n);
-%     Gc_interp = griddedInterpolant(G_grid, n_grid, gc_table, 'linear');
-% 
-%     % 1D interpolants for Gmin(n), Gmax(n)
-%     Gmin_interp = griddedInterpolant(n, mins, 'linear');
-%     Gmax_interp = griddedInterpolant(n, maxs, 'linear');
-% 
-%     % Cache
-%     s.Gc_interp   = Gc_interp;
-%     s.Gmin_interp = Gmin_interp;
-%     s.Gmax_interp = Gmax_interp;
-%     if isempty(cache), cache = struct; end
-%     cache.(profile) = s;
-% end
-% 
-% function mu = NFW_mu(c)
-%     % NFWProfile.mu(c) = f(c) / f(1), but Colossus uses a particular
-%     % "enclosed mass" convention. For Diemer19, the key is to use the
-%     % same f(c) as in Diemer's code:
-%     % f(c) = ln(1+c) - c/(1+c).
-%     % mu(c) is then normalized enclosed mass; for the DJ19 G(c) definition,
-%     % you can directly set:
-%     f = log(1 + c) - c ./ (1 + c);
-%     mu = f;  % normalization absorbed into the G-table fit
-% end
-
 function [Gc_interp, Gmin_interp, Gmax_interp] = get_Gc_table(profile)
     % profile: 'nfw' only for now
 
@@ -172,7 +81,11 @@ function [Gc_interp, Gmin_interp, Gmax_interp] = get_Gc_table(profile)
 end
 
 function mu = NFW_mu(c)
-    % NFWProfile.mu(c) analog: use standard f(c)
+    % NFWProfile.mu(c) = f(c) / f(1). For Diemer19, the key is to use the
+    % same f(c) as in Diemer's code:
+    % f(c) = ln(1+c) - c/(1+c).
+    % mu(c) is then normalized enclosed mass; for the DJ19 G(c) definition,
+    % you can directly set:
     f = log(1 + c) - c ./ (1 + c);
     mu = f;   % normalization absorbed into fit
 end
