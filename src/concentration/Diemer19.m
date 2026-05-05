@@ -1,16 +1,19 @@
-function c = Diemer19(M, z, cosmo, mode)
+function c = Diemer19(M, z, cosmo, mode, varargin)
 % Diemer19_concentration  Diemer & Joyce (2019) concentration model
 %
 %   c = Diemer19_concentration(M, z, cosmo, mode)
+%   c = Diemer19_concentration(M, z, cosmo, mode, profile_name)
 %
 %   Identical functional form and root-finding method as Ishiyama21.
 %   Only the parameter table differs (Diemer19_Table vs Ishiyama21_Table2).
 %
 %   INPUTS
-%   M     : halo mass [Msun/h], scalar or vector
-%   z     : redshift (scalar)
-%   cosmo : cosmology struct from cosmology() + attach_linear_components()
-%   mode  : '200c_all' | '200c_relaxed' | 'vir_all' | 'vir_relaxed'
+%   M            : halo mass [Msun/h], scalar or vector
+%   z            : redshift (scalar)
+%   cosmo        : cosmology struct from cosmology() + attach_linear_components()
+%   mode         : '200c_all' | '200c_relaxed' | 'vir_all' | 'vir_relaxed'
+%   profile_name : (optional) string, profile for G-table. Default: 'nfw'
+%                  See profile_mu.m for supported profiles.
 %
 %   OUTPUT
 %   c     : concentration, same shape as M
@@ -18,7 +21,6 @@ function c = Diemer19(M, z, cosmo, mode)
 %   Reference: Diemer & Joyce 2019, ApJ 871, 168
 
     P = Diemer19_Table(mode);
-
     params.kappa   = P.kappa;
     params.a0      = P.a0;
     params.a1      = P.a1;
@@ -26,6 +28,5 @@ function c = Diemer19(M, z, cosmo, mode)
     params.b1      = P.b1;
     params.c_alpha = P.cAlpha;
 
-    c = Diemer19_general(M, z, cosmo, params);
+    c = Diemer19_general(M, z, cosmo, params, varargin{:});
 end
-

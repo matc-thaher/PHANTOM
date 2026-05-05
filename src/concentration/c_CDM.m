@@ -187,19 +187,18 @@ switch lower(model)
         [cosmo, mode] = parse_args(varargin, 'individual_all', 'child18');
         c = Child18(M, z, cosmo, mode);
 
-    % ================================================================
+       % ================================================================
     % Diemer & Joyce 2019
     % ================================================================
     case {'diemer19', 'dj19'}
-        [cosmo, mode] = parse_args(varargin, 'median', 'diemer19');
-        c = Diemer19(M, z, cosmo, mode);
-
+        [cosmo, mode, profile_name] = parse_args(varargin, 'median', 'diemer19');
+        c = Diemer19(M, z, cosmo, mode, profile_name);
     % ================================================================
     % Ishiyama et al. 2021  (default)
     % ================================================================
     case {'ishiyama21', 'ish21'}
-        [cosmo, mode] = parse_args(varargin, '200c_all', 'ishiyama21');
-        c = Ishiyama21(M, z, cosmo, mode);
+        [cosmo, mode, profile_name] = parse_args(varargin, 'vir_all', 'ishiyama21');
+        c = Ishiyama21(M, z, cosmo, mode, profile_name);
 
     % ================================================================
     otherwise
@@ -212,9 +211,7 @@ end
 
 
 % =========================================================================
-function [cosmo, mode] = parse_args(v, default_mode, model_name)
-% Extract (cosmo, mode) from varargin. Cosmo is required for all models
-% except bullock01. Mode falls back to default_mode when omitted.
+function [cosmo, mode, profile_name] = parse_args(v, default_mode, model_name)
     if isempty(v)
         error('c_CDM: model "%s" requires cosmo as 4th argument.', model_name);
     end
@@ -223,5 +220,10 @@ function [cosmo, mode] = parse_args(v, default_mode, model_name)
         mode = v{2};
     else
         mode = default_mode;
+    end
+    if numel(v) >= 3 && ~isempty(v{3})
+        profile_name = v{3};
+    else
+        profile_name = 'nfw';
     end
 end
