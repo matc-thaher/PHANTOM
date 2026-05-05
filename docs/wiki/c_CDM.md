@@ -5,7 +5,7 @@
 
 ---
 
-Unified dispatcher for all CDM concentration-mass relations in PHANTOM. Instead of calling individual model functions directly, `c_CDM` provides a single consistent interface that routes to any of the 11 supported models by name. The default model is `ishiyama21`.
+Unified dispatcher for all CDM concentration-mass relations in PHANTOM. Instead of calling individual model functions directly, `c_CDM` provides a single consistent interface that routes to any of the 12 supported models by name. The default model is `ishiyama21`.
 
 ---
 
@@ -53,6 +53,7 @@ c = c_CDM(M, z, model, cosmo, mode)
 | `'child18'` | `'c18'` | Yes | `'individual_all'` |
 | `'diemer19'` | `'dj19'` | Yes | `'200c_all'` |
 | `'ishiyama21'` | `'i21'` | Yes | `'200c_all'` |
+| `'ishiyama21_zero'` | `'ish21z'` | Yes   | `'200c_all'`        |
 
 ---
 
@@ -100,6 +101,7 @@ title('Concentration-Mass Relations at z=0');
 ## Notes
 
 - Models that do not require `cosmo` (`duffy08`, `klypin11`, `dutton14`) can be called with just `M`, `z`, and `model`. Passing a `cosmo` struct to these is harmless — it is simply ignored.
+- `Ishiyama21_zero` provides a direct `fzero` implementation of the Ishiyama et al. (2021) concentration model, in contrast to `Ishiyama21` which reuses the general Diemer19 engine and a precomputed left-hand-side table.
 - The `mode` string format varies by model. When omitted, the function uses the default listed in the table above. See each individual model page for the full list of valid mode strings.
 - `bhattacharya13` and `ludlow16_fit` are available as standalone functions but are **not** currently routed through `c_CDM`. Call them directly if needed.
 

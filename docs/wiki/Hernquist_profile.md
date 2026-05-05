@@ -12,7 +12,7 @@ Computes the Hernquist (1990) density profile. The Hernquist profile is algebrai
 ## Syntax
 
 ```matlab
-[rho, rhos, rs] = Hernquist_profile(r, M, c, z, cosmo, Delta)
+[rho, rhos, rs, fc] = Hernquist_profile(r, M, c, z, cosmo, Delta)
 ```
 
 ---
@@ -44,6 +44,7 @@ Computes the Hernquist (1990) density profile. The Hernquist profile is algebrai
 | `rho` | `Msun/h / (Mpc/h)^3` | Hernquist density at each radius in `r` |
 | `rhos` | `Msun/h / (Mpc/h)^3` | Characteristic density normalisation |
 | `rs` | `Mpc/h` | Scale radius |
+| `fc`   | — | Concentration‑dependent mass factor \(M/M_{\mathrm{tot}}\) |
 
 ---
 
@@ -80,7 +81,7 @@ Delta = 200;
 cosmo.rhocrit0 = 2.775e11;
 cosmo.E = @(z) sqrt(0.3*(1+z)^3 + 0.7);
 
-[rho, rhos, rs] = Hernquist_profile(r, M, c, z, cosmo, Delta);
+[rho, rhos, rs, fc] = Hernquist_profile(r, M, c, z, cosmo, Delta);
 
 loglog(r, rho, 'g-', 'LineWidth', 1.5);
 xlabel('r [Mpc/h]');

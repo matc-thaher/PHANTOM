@@ -12,7 +12,7 @@ Computes the Einasto (1965) density profile with the shape parameter α_e derive
 ## Syntax
 
 ```matlab
-[rho, rhos, rs] = Einasto_profile(r, M, c, z, cosmo, Delta)
+[rho, rhos, rs, fc] = Einasto_profile(r, M, c, z, cosmo, Delta)
 ```
 
 ---
@@ -45,6 +45,7 @@ Computes the Einasto (1965) density profile with the shape parameter α_e derive
 | `rho` | `Msun/h / (Mpc/h)^3` | Einasto density at each radius in `r` |
 | `rhos` | `Msun/h / (Mpc/h)^3` | Characteristic density at the scale radius |
 | `rs` | `Mpc/h` | Scale radius |
+| `fc`   | — | Concentration‑dependent mass factor \(M/M_{\mathrm{tot}}\) |
 
 ---
 
@@ -102,7 +103,7 @@ cosmo.rhocrit0 = 2.775e11;           % Msun/h / (Mpc/h)^3
 cosmo.E        = @(z) sqrt(0.3*(1+z)^3 + 0.7);
 cosmo.nu       = @(M,z) my_peak_height(M, z);  % user-defined
 
-[rho, rhos, rs] = Einasto_profile(r, M, c, z, cosmo, Delta);
+[rho, rhos, rs, fc] = Einasto_profile(r, M, c, z, cosmo, Delta);
 
 loglog(r, rho, 'r-', 'LineWidth', 1.5);
 xlabel('r [Mpc/h]');

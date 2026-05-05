@@ -7,6 +7,8 @@
 
 Computes halo concentration from the Ishiyama et al. (2021) model — the most comprehensive and physically motivated concentration model in PHANTOM. It supports six halo definitions and sample types, and is valid across any cosmology due to its dependence on peak height, the local power-spectrum slope, and the growth rate. This is the **recommended default model** in `c_CDM`.
 
+Optionally, a `profile_name` argument selects the profile used for the \lhs\) table (default `'nfw'`); see `profile_mu.m` for the list of supported profiles.
+
 ---
 
 ## Syntax
@@ -25,6 +27,8 @@ c = Ishiyama21(M, z, cosmo, mode)
 | `z` | scalar | — | Redshift |
 | `cosmo` | struct | — | Cosmology struct (see required fields below) |
 | `mode` | string | — | Halo definition + sample (see table below) |
+| `Profile-name` | string | — | Use specific profile for building  |
+
 
 ### Required `cosmo` fields
 

@@ -7,6 +7,8 @@
 
 Computes halo concentration from the Diemer & Joyce (2019) model. This model shares the same functional form as [`Ishiyama21`](Ishiyama21) but uses a different parameter table. It is the predecessor to Ishiyama21 and is based on an analytic framework linking concentration to peak height, the local power spectrum slope, and the growth rate of structure.
 
+Optionally, a `profile_name` argument selects the profile used for the \lhs\) table (default `'nfw'`); see `profile_mu.m` for the list of supported profiles.
+
 ---
 
 ## Syntax
@@ -25,6 +27,7 @@ c = Diemer19(M, z, cosmo, mode)
 | `z` | scalar | — | Redshift |
 | `cosmo` | struct | — | Cosmology struct with `cosmo.sigmaM`, `cosmo.neff`, `cosmo.alphaEff` |
 | `mode` | string | — | Halo definition + sample (see table below) |
+| `Profile-name` | string | — | Use specific profile for building  |
 
 ## Output
 
