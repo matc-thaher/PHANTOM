@@ -19,7 +19,6 @@ The **recommended entry point** for all models is [`c_CDM`](c_CDM), which acts a
 | [`Duffy08`](Duffy08) | Duffy et al. 2008 | 200c, vir, 200m | No |
 | [`Dutton14`](Dutton14) | Dutton & Macciò 2014 | 200c, vir | No |
 | [`Ishiyama21`](Ishiyama21) | Ishiyama et al. 2021 | 200c, vir, 500c | Yes (σ, n_eff, α) |
-| [`Ishiyama21_zero`](Ishiyama21_zero) | Ishiyama et al. 2021 | 200c, vir, 500c | Yes (σ, n_eff, α) |
 | [`Klypin11`](Klypin11) | Klypin et al. 2011 | vir | No |
 | [`Klypin16`](Klypin16) | Klypin et al. 2016 | 200c, vir | Optional (σ for cnu) |
 | [`Ludlow16`](Ludlow16) | Ludlow et al. 2016 (analytic) | 200c | Yes (σ, D(z), ρ_crit) |

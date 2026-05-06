@@ -7,14 +7,14 @@
 
 Computes halo concentration from the Diemer & Joyce (2019) model. This model shares the same functional form as [`Ishiyama21`](Ishiyama21) but uses a different parameter table. It is the predecessor to Ishiyama21 and is based on an analytic framework linking concentration to peak height, the local power spectrum slope, and the growth rate of structure.
 
-Optionally, a `profile_name` argument selects the profile used for the \lhs\) table (default `'nfw'`); see `profile_mu.m` for the list of supported profiles.
+Optionally, a `profile_name` argument selects the halo density profile used in the \(G(c)\) relation and its inversion (default `'nfw'`); see `profile_mu.m` for the list of supported profiles.
 
 ---
 
 ## Syntax
 
 ```matlab
-c = Diemer19(M, z, cosmo, mode)
+c = Diemer19(M, z, cosmo, mode, profile_name, method)
 ```
 
 ---
@@ -27,7 +27,8 @@ c = Diemer19(M, z, cosmo, mode)
 | `z` | scalar | — | Redshift |
 | `cosmo` | struct | — | Cosmology struct with `cosmo.sigmaM`, `cosmo.neff`, `cosmo.alphaEff` |
 | `mode` | string | — | Halo definition + sample (see table below) |
-| `Profile-name` | string | — | Use specific profile for building  |
+| `profile_name` | string | — | (Optional) Profile used in the \(G(c)\) relation; default `'nfw'`. See `profile_mu.m` for supported values. |
+| `method` | string | — | (Optional) Solver method: `'fzero'` (direct root finding, default) or `'table'` (interpolation via `build_lhs_table`). |
 
 ## Output
 
@@ -81,8 +82,8 @@ The root-finding uses an adaptive bracket + `fzero`.
 M = logspace(11, 15, 100);   % Msun/h
 z = 0;
 
-c_all  = Diemer19(M, z, cosmo, '200c_all');
-c_relx = Diemer19(M, z, cosmo, '200c_relaxed');
+c_all  = Diemer19(M, z, cosmo, '200c_all', 'hernquist', 'fzero');
+c_relx = Diemer19(M, z, cosmo, '200c_relaxed', 'nfw', 'table');
 
 loglog(M, c_all, M, c_relx, 'LineWidth', 1.5);
 legend('All halos','Relaxed halos');

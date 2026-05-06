@@ -7,14 +7,14 @@
 
 Computes halo concentration from the Ishiyama et al. (2021) model — the most comprehensive and physically motivated concentration model in PHANTOM. It supports six halo definitions and sample types, and is valid across any cosmology due to its dependence on peak height, the local power-spectrum slope, and the growth rate. This is the **recommended default model** in `c_CDM`.
 
-Optionally, a `profile_name` argument selects the profile used for the \lhs\) table (default `'nfw'`); see `profile_mu.m` for the list of supported profiles.
+Optionally, a `profile_name` argument selects the halo density profile used in the \(G(c)\) relation and its inversion (default `'nfw'`); see `profile_mu.m` for the list of supported profiles.
 
 ---
 
 ## Syntax
 
 ```matlab
-c = Ishiyama21(M, z, cosmo, mode)
+c = Ishiyama21(M, z, cosmo, mode, profile_name, method)
 ```
 
 ---
@@ -27,7 +27,8 @@ c = Ishiyama21(M, z, cosmo, mode)
 | `z` | scalar | — | Redshift |
 | `cosmo` | struct | — | Cosmology struct (see required fields below) |
 | `mode` | string | — | Halo definition + sample (see table below) |
-| `Profile-name` | string | — | Use specific profile for building  |
+| `profile_name` | string | — | (Optional) Profile used in the \(G(c)\) relation; default `'nfw'`. See `profile_mu.m` for supported values. |
+| `method` | string | — | (Optional) Solver method: `'fzero'` (direct root finding, default) or `'table'` (interpolation via `build_lhs_table`). |
 
 
 ### Required `cosmo` fields
@@ -104,10 +105,10 @@ z = 0;
 c_all  = Ishiyama21(M, z, cosmo, '200c_all');
 
 % Relaxed halos, M_200c
-c_relx = Ishiyama21(M, z, cosmo, '200c_relaxed');
+c_relx = Ishiyama21(M, z, cosmo, '200c_relaxed', 'einasto');
 
 % M_500c all halos
-c_500  = Ishiyama21(M, z, cosmo, '500_all');
+c_500  = Ishiyama21(M, z, cosmo, '500_all', 'einasto', 'table');
 
 loglog(M, c_all, M, c_relx, M, c_500, 'LineWidth', 1.5);
 legend('200c all','200c relaxed','500c all');
