@@ -201,10 +201,17 @@ switch lower(model)
         c = Ishiyama21(M, z, cosmo, mode, profile_name);
 
     % ================================================================
+    % Ishiyama et al. 2021 — direct fzero implementation
+    % ================================================================
+    case {'ishiyama21_zero', 'ish21z'}
+        [cosmo, mode, ~] = parse_args(varargin, '200c_all', 'ishiyama21_zero');
+        c = Ishiyama21_zero(M, z, cosmo, mode);
+
+    % ================================================================
     otherwise
         error(['c_CDM: unknown model "%s".\n' ...
                'Valid: bullock01, duffy08, klypin11, prada12, dutton14,\n' ...
-               '       diemer15, ludlow16, klypin16, child18, diemer19, ishiyama21.'], ...
+               '       diemer15, ludlow16, klypin16, child18, diemer19, ishiyama21, ishiyama21_zero.'], ...
                model);
 end
 end

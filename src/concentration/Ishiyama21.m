@@ -21,8 +21,9 @@ function c = Ishiyama21(M, z, cosmo, mode, varargin)
 %             'vir_relaxed'  — M_vir,  relaxed haloes
 %             '500_all'      — M_500c, all haloes
 %             '500_relaxed'  — M_500c, relaxed haloes
-%  profile_name : (optional) string, profile for G-table. Default: 'nfw'
+%  profile_name : (optional) string, profile for lhs-table. Default: 'nfw'
 %                  See profile_mu.m for supported profiles.
+%   method       : (optional) string, solver type: 'fzero' (default) or 'table'.
 %
 %   OUTPUT
 %   c     : halo concentration, same shape as M
@@ -33,6 +34,16 @@ function c = Ishiyama21(M, z, cosmo, mode, varargin)
 %              Diemer & Joyce 2019, ApJ 871, 168  (original functional form)
 % -------------------------------------------------------------------------
 
+    profile_name = 'nfw';
+    method       = 'fzero';
+
+    if numel(varargin) >= 1 && ~isempty(varargin{1})
+        profile_name = varargin{1};
+    end
+    if numel(varargin) >= 2 && ~isempty(varargin{2})
+        method = lower(varargin{2});
+    end
+
     P = Ishiyama21_Table(mode);  % same as you already have
     params.kappa   = P.kappa;
     params.a0      = P.a0;
@@ -41,5 +52,12 @@ function c = Ishiyama21(M, z, cosmo, mode, varargin)
     params.b1      = P.b1;
     params.c_alpha = P.cAlpha;
 
-    c = Diemer19_general(M, z, cosmo, params, varargin{:});
+    switch method
+        case 'fzero'
+            c = Diemer19_zero_general(M, z, cosmo, params, profile_name);
+        case 'table'
+            c = Diemer19_general(M, z, cosmo, params, profile_name);
+        otherwise
+            error('Diemer19: unknown method \"%s\". Use ''fzero'' or ''table''.', method);
+    end
 end
