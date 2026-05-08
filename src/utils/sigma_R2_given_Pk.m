@@ -1,25 +1,33 @@
- function s2 = sigma_R2_given_Pk( R, z, cosmo, Pk_handle)
+function s2 = sigma_R2_given_Pk(R, z, cosmo, Pk_handle, filter_name)
     % Compute sigma^2(R,z) using a user-supplied P(k)
-    % -------------------------------------------------
-    % R          : radius (Mpc/h)
-    % z          : redshift
-    % cosmo      : cosmology struct (needed for growth factor)
-    % Pk_handle  : function handle for P(k) at z=0 (unnormalized or unit)
+    % R         : radius (Mpc/h), scalar or vector
+    % z         : redshift
+    % cosmo     : cosmology struct
+    % Pk_handle : handle for P(k) at z=0
+    % filter_name (optional): 'tophat', 'gaussian', 'sharpk', 'smoothk', 'vsmk'
 
-        % k-grid for integration
-        lnk = linspace(log(1e-6), log(1e4), 4000).';   % log-spaced, wider range
-        k   = exp(lnk);
-    
-        % Fourier-space top-hat window function
-        x   = k .* R;
-        W   = 3*(sin(x) - x.*cos(x)) ./ (x.^3 + (x==0));
-    
-        % Apply growth factor if needed
-        D   = cosmo.D(z) / cosmo.D(0);
-        Pk  = Pk_handle(k(:)) * D^2;
-    
-        % Compute sigma^2
-        integrand = Pk .* W.^2 .* k.^3;   % k^3 for d(lnk) — NOT k^2 dk
-        s2  = (1/(2*pi^2)) * trapz(lnk, integrand);
+    if nargin < 5 || isempty(filter_name)
+        if isfield(cosmo, 'variance_filter') && ~isempty(cosmo.variance_filter)
+            filter_name = cosmo.variance_filter;
+        else
+            filter_name = 'tophat';
+        end
+    end
 
+    lnk = linspace(log(1e-6), log(1e4), 4000).';
+    k   = exp(lnk);
+
+    D   = cosmo.D(z) / cosmo.D(0);
+    Pk  = Pk_handle(k) .* D^2;
+
+    R = R(:).';
+    x = k .* R;
+    W = variance_window(x, filter_name);
+
+    integrand = Pk .* W.^2 .* k.^3;
+    s2 = (1/(2*pi^2)) * trapz(lnk, integrand, 1);
+
+    if isscalar(R)
+        s2 = s2(1);
+    end
 end
