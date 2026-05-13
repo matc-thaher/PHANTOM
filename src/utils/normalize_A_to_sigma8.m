@@ -1,7 +1,7 @@
  function A = normalize_A_to_sigma8( cosmo)
     % Normalization amplitude A so that sigma8 matches
 
-        R8 = 8.0; % Mpc
+        R8 = 8.0; % Mpc/h
 
         Pk0_unit = @(k) cosmo.Pk0_unnorm(k);
 

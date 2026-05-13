@@ -20,14 +20,51 @@
             case 'eh98_full'
                 cosmo.T = @(k) T_EH98_full(k, cosmo);
 
+            case 'sugiyama95'
+                cosmo.T = @(k) T_Sugiyama95(k, cosmo);
+
             case 'camb'
-                % Load CAMB transfer function once and build interpolant
-                d = load(cosmo.camb_transfer_file, 'k_h', 'T_camb');
-                k_tab = d.k_h(:);
-                T_tab = d.T_camb(:);
-                % Log-linear interpolation, clamp extrapolation to boundary values
-                cosmo.T = @(k) interp1(log(k_tab), T_tab, log(k(:)), ...
-                                   'pchip', 'extrap');
+                 if ~isfield(cosmo,'python_exe') || isempty(cosmo.python_exe)
+                    error(['For transfer_model = ''camb'', you must provide cosmo.python_exe ' ...
+                        'with the full path to the Python executable, e.g. ' ...
+                        '''C:\Python311\python.exe''.']);
+                end
+                if ~isfield(cosmo,'camb_minkh') || isempty(cosmo.camb_minkh)
+                    cosmo.camb_minkh = 1e-4;
+                end
+                if ~isfield(cosmo,'camb_maxkh') || isempty(cosmo.camb_maxkh)
+                    cosmo.camb_maxkh = 100.0;
+                end
+                if ~isfield(cosmo,'camb_npoints') || isempty(cosmo.camb_npoints)
+                    cosmo.camb_npoints = 2000;
+                end
+
+                if isfield(cosmo,'As') && ~isempty(cosmo.As)
+                    [k_tab, P_tab] = camb_power(cosmo, ...
+                        'python_exe', cosmo.python_exe, ...
+                        'minkh',      cosmo.camb_minkh, ...
+                        'maxkh',      cosmo.camb_maxkh, ...
+                        'npoints',    cosmo.camb_npoints, ...
+                        'As',         cosmo.As);
+                else
+                    [k_tab, P_tab] = camb_power(cosmo, ...
+                        'python_exe', cosmo.python_exe, ...
+                        'minkh',      cosmo.camb_minkh, ...
+                        'maxkh',      cosmo.camb_maxkh, ...
+                        'npoints',    cosmo.camb_npoints);
+                end
+
+                % Store tables for later use if needed
+                cosmo.k_camb = k_tab;
+                cosmo.Pk0_camb_tab = P_tab;
+
+                % Interpolated z=0 linear matter power spectrum
+                cosmo.Pk0 = @(k) interp1(log(k_tab), P_tab, ...
+                    min(max(log(k(:)), log(k_tab(1))), log(k_tab(end))), ...
+                    'pchip');
+
+                % Optional effective transfer function, only for plotting/diagnostics
+                cosmo.T = @(k) sqrt(cosmo.Pk0(k) ./ k.^cosmo.ns);
 
             otherwise  % default: EH98 zero-baryon
                 cosmo.T = @(k) T_EH98(k, cosmo);
@@ -50,12 +87,18 @@
             cosmo.filter_c = 1.0;
         end
 
-        % Unnormalized power spectrum
-        cosmo.Pk0_unnorm = @(k) k.^cosmo.ns .* cosmo.T(k).^2;
+        % % Unnormalized power spectrum
+        % cosmo.Pk0_unnorm = @(k) k.^cosmo.ns .* cosmo.T(k).^2;
+        % 
+        % % Normalize P(k) to sigma8
+        % A = normalize_A_to_sigma8(cosmo);
+        % cosmo.Pk0 = @(k) A * cosmo.Pk0_unnorm(k);
+        if ~strcmpi(cosmo.transfer_model,'camb')
+            cosmo.Pk0_unnorm = @(k) k.^cosmo.ns .* cosmo.T(k).^2;
+            A = normalize_A_to_sigma8(cosmo);
+            cosmo.Pk0 = @(k) A * cosmo.Pk0_unnorm(k);
+        end
 
-        % Normalize P(k) to sigma8
-        A = normalize_A_to_sigma8(cosmo);
-        cosmo.Pk0 = @(k) A * cosmo.Pk0_unnorm(k);
         cosmo.Pk  = @(k,z) cosmo.Pk0(k) .* (cosmo.D(z)/cosmo.D(0)).^2;
 
         % σ(R,z) and σ(M,z)

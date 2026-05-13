@@ -5,7 +5,7 @@ function D = growth_with_radiation(z, cosmo)
 
     % Note: Ez_D uses radiation as constant (not (1+z)^4) to avoid divergence
     % at high-z in the integral — same approach as Colossus
-    Ez_D      = @(zp) sqrt(cosmo.Omega_m.*(1+zp).^3 + cosmo.Omega_L + cosmo.Omega_r);
+    Ez_D      = @(zp) sqrt(cosmo.Omega_m.*(1+zp).^3 + cosmo.Omega_L + (cosmo.Omega_r);
     integrand = @(zp) (1+zp) ./ Ez_D(zp).^3;
 
     % Gnedin+2011 Eq.5 — matter-radiation regime analytic approximation
@@ -30,7 +30,7 @@ function D = growth_with_radiation(z, cosmo)
     if any(mask_low)
         zl = z(mask_low);
         Dl = arrayfun(@(zi) integral(integrand, zi, Inf, ...
-                     'RelTol',1e-6,'AbsTol',1e-10), zl);
+                     'RelTol',1e-4,'AbsTol',1e-10, 'ArrayValued', true), zl);
         D(mask_low) = 5/2 * cosmo.Omega_m .* Ez_D(zl) .* Dl;
     end
 
@@ -43,7 +43,7 @@ function D = growth_with_radiation(z, cosmo)
     if any(mask_mid)
         zm  = z(mask_mid);
         Dm  = arrayfun(@(zi) integral(integrand, zi, Inf, ...
-                      'RelTol',1e-6,'AbsTol',1e-10), zm);
+                      'RelTol',1e-4,'AbsTol', 0, 'ArrayValued', true), zm);
         D_int = 5/2 * cosmo.Omega_m .* Ez_D(zm) .* Dm;
         D_gne = gnedin(a(mask_mid));
         at1   = log(1/(zt1+1));
@@ -56,6 +56,6 @@ function D = growth_with_radiation(z, cosmo)
     % 1+z_eq term is not needed as it will be normalized by D0 and it will
     % automatically cancel out here.
     D0 = 5/2 * cosmo.Omega_m * Ez_D(0) * ...
-         integral(integrand, 0, Inf, 'RelTol',1e-6,'AbsTol',1e-10);
+         integral(integrand, 0, Inf, 'RelTol',1e-4,'AbsTol', 0, 'ArrayValued', true);
     D  = D ./ D0;
 end

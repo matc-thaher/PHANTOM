@@ -5,6 +5,8 @@ function T = T_EH98_full(k, cosmo)
     Om  = cosmo.Omega_m;
     Ob  = cosmo.Omega_b;
     h   = cosmo.h;
+    k   = k*cosmo.h;
+    
     Tcmb = 2.7255 / 2.7;   % CMB temperature ratio (theta_cmb)
 
     Omh2 = Om * h^2;
@@ -23,8 +25,10 @@ function T = T_EH98_full(k, cosmo)
            * (1 + (b1 * Obh2^b2));
 
     %% --- Sound horizon at drag epoch (Eq. 5 & 6) ---
-    R_eq = 31.5e3 * Obh2 * Tcmb^(-4) * (1000/z_eq);         % drag epoch
-    R_d  = 31.5e3 * Obh2 * Tcmb^(-4) * (1000/z_d);          % epoch of matter-radiation equality
+    % R_eq = 31.5e3 * Obh2 * Tcmb^(-4) * (1000/z_eq);         % drag epoch
+    % R_d  = 31.5e3 * Obh2 * Tcmb^(-4) * (1000/z_d);          % epoch of matter-radiation equality
+    R_eq = 31.5 * Obh2 / Tcmb^4 / (z_eq / 1e3);   % matter-radiation equality
+    R_d  = 31.5 * Obh2 / Tcmb^4 / (z_d / 1e3);    % drag epoch
     s    = 2/(3*k_eq) * sqrt(6/R_eq) * ...
            log((sqrt(1+R_d) + sqrt(R_d+R_eq)) / (1 + sqrt(R_eq)));
 

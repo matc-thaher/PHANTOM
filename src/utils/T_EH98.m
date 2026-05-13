@@ -14,7 +14,7 @@
                     + 0.38*log(22.3*(Om*h.^2))*(Ob/Om).^2;
 
         Gamma_eff = Om*h * (alpha_gamma + ...
-                   (1 - alpha_gamma) ./ (1 + (0.43*k*s).^4));
+                   (1 - alpha_gamma) ./ (1 + (0.43*k*h*s).^4));
 
         q = k .* theta.^2 ./ Gamma_eff;
 

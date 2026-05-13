@@ -18,10 +18,10 @@ function D = growth_integral(z, cosmo)
     z   = z(:);
     D   = zeros(size(z));
     for i = 1:numel(z)
-        D(i) = integral(integrand, z(i), Inf, 'RelTol', 1e-6, 'AbsTol', 1e-10);
+        D(i) = integral(integrand, z(i), Inf, 'RelTol', 1e-4, 'AbsTol', 0, 'ArrayValued', true);
     end
 
-    D   = (5/2) .* Om .* one_plus_zeq .* Ez(z) .* D;
-    D0  = (5/2) .* Om .* one_plus_zeq .* Ez(0) .* integral(integrand, 0, Inf, 'RelTol', 1e-6, 'AbsTol', 1e-10);
+    D   = (5/2) .* Om .* one_plus_zeq .* cosmo.E(z) .* D;
+    D0  = (5/2) .* Om .* one_plus_zeq .* cosmo.E(0) .* integral(integrand, 0, Inf, 'RelTol', 1e-4, 'AbsTol', 0, 'ArrayValued', true);
     D   = D ./ D0;
 end
