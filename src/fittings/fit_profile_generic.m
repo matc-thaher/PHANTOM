@@ -23,6 +23,8 @@ function result = fit_profile_generic(r, rho, profile_name, r_cut_low, r_cut_hig
 %             Used only for 'einasto_fit' and 'dk14_fit'.
 %             Pass this when you have a prior from the halo peak height:
 %               alpha_e = 0.155 + 0.0095 * nu^2   (Gao+2008, eq. 5)
+%  'r2_in' : the first radius value from where user want to build the fit
+%   'Verbose'         : true (default) | false
 %
 % EXAMPLES
 %   % default alpha
@@ -88,9 +90,11 @@ function result = fit_profile_generic(r, rho, profile_name, r_cut_low, r_cut_hig
   p = inputParser();
   addParameter(p, 'alpha', 0.18, @(x) isnumeric(x) && isscalar(x) && x > 0);
   addParameter(p, 'r_ext',    [],   @(x) isnumeric(x) && isscalar(x) && x > 0);
+  addParameter(p, 'Verbose', false, @(x) islogical(x) || isnumeric(x));
   parse(p, varargin{:});
   alpha_in = p.Results.alpha;
   r2_in    = p.Results.r_ext;
+  opt      = p.Results;
 
   % --- environment detection -----------------------------------------
   is_octave = exist('OCTAVE_VERSION', 'builtin') ~= 0;
@@ -303,12 +307,14 @@ function result = fit_profile_generic(r, rho, profile_name, r_cut_low, r_cut_hig
   result.BIC       = BIC;
 
   % --- print summary -------------------------------------------------
-  fprintf('\n--- Fit summary: %s ---\n',    profile_name);
-  fprintf('  N = %d pts  |  dof = %d\n',   N, dof);
-  fprintf('  log-RSS     = %.4e\n',         log_rss);
-  fprintf('  RMSE        = %.4f dex\n',     rmse);
-  fprintf('  chi2_red    = %.4f\n',         chi2_red);
-  fprintf('  R2          = %.6f\n',         R2);
-  fprintf('  max|resid|  = %.4f dex\n',     max_resid);
-  fprintf('  AIC = %.2f  |  BIC = %.2f\n',  AIC, BIC);
+  if opt.Verbose
+    fprintf('\n--- Fit summary: %s ---\n',    profile_name);
+    fprintf('  N = %d pts  |  dof = %d\n',   N, dof);
+    fprintf('  log-RSS     = %.4e\n',         log_rss);
+    fprintf('  RMSE        = %.4f dex\n',     rmse);
+    fprintf('  chi2_red    = %.4f\n',         chi2_red);
+    fprintf('  R2          = %.6f\n',         R2);
+    fprintf('  max|resid|  = %.4f dex\n',     max_resid);
+    fprintf('  AIC = %.2f  |  BIC = %.2f\n',  AIC, BIC);
+  end
 end

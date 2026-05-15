@@ -1,11 +1,8 @@
-function [best_m, best_chi2, rss_list, chi2_list, rmse_list] = find_best_m(profile_name, rc, ...
-                                                                              r, rho, m_range)
+function [best_m, best_score, metric_list, stats] = find_best_m(profile_name, rc, r, rho, m_range, varargin)
 % FIND_BEST_M  Scan cutoff multiplier m to find optimal r_cut = m * rc.
 %
-% Selects the best cutoff by minimizing reduced chi-squared (chi2_red),
-% which is a normalized goodness-of-fit that accounts for the number of
-% data points available at each cutoff. This is more reliable than raw
-% log-RSS, which shrinks artificially as fewer points are included.
+% By default, the optimal cutoff is chosen using reduced chi-squared, but
+% the user may select any supported fit statistic through 'SelectionMetric'.
 %
 % INPUTS
 %   profile_name : 'nfw' | 'soliton' | 'einasto_fit' | 'hernquist_fit' | 'dk14_fit'
@@ -13,13 +10,16 @@ function [best_m, best_chi2, rss_list, chi2_list, rmse_list] = find_best_m(profi
 %   r            : full radius array [kpc], column vector
 %   rho          : full density array [Msun/kpc^3], column vector
 %   m_range      : 1x2 vector [m_min, m_max], e.g. [2, 10]
+% NAME-VALUE OPTIONS
+%   'SelectionMetric' : 'chi2' (default) | 'rmse' | 'rss' | 'aic' | ...
+%                       'bic' | 'maxresid' | 'r2'
+%   'Verbose'         : true (default) | false
 %
 % OUTPUTS
-%   best_m       : optimal cutoff multiplier (minimises chi2_red)
-%   best_chi2    : reduced chi-squared at best_m
-%   rss_list     : log-RSS values across all m tested (100 steps)
-%   chi2_list    : chi2_red values across all m tested
-%   rmse_list    : RMSE [dex] values across all m tested
+%   best_m       : optimal cutoff multiplier
+%   best_score   : best value of the chosen metric
+%   metric_list  : values of the chosen metric across all m tested
+%   stats        : struct containing all scanned statistics
 %
 % WHY chi2_red INSTEAD OF raw log-RSS?
 %   Raw log-RSS decreases whenever data points are removed, so a fitter
@@ -31,43 +31,111 @@ function [best_m, best_chi2, rss_list, chi2_list, rmse_list] = find_best_m(profi
 %   dof = N_pts - N_params. If dof < 1 the fit is underdetermined and
 %   that m value is skipped (set to Inf in chi2_list).
 
-  m_values  = linspace(m_range(1), m_range(2), 100);
-  rss_list  = zeros(size(m_values));
-  chi2_list = zeros(size(m_values));
-  rmse_list = zeros(size(m_values));
-  r_max     = max(r);
+  p = inputParser;
+  addParameter(p, 'SelectionMetric', 'chi2', @(x) ischar(x) || isstring(x));
+  addParameter(p, 'Verbose', true, @(x) islogical(x) || isnumeric(x));
+  parse(p, varargin{:});
+  opt = p.Results;
 
-  for i = 1:length(m_values)
+  selection_metric = lower(string(opt.SelectionMetric));
+
+  m_values = linspace(m_range(1), m_range(2), 100);
+  r_max    = max(r);
+
+  n = numel(m_values);
+  stats = struct();
+  stats.m_values   = m_values;
+  stats.rss        = Inf(1, n);
+  stats.chi2       = Inf(1, n);
+  stats.rmse       = Inf(1, n);
+  stats.R2         = -Inf(1, n);
+  stats.maxresid   = Inf(1, n);
+  stats.AIC        = Inf(1, n);
+  stats.BIC        = Inf(1, n);
+
+  for i = 1:n
     r_cut = m_values(i) * rc;
+
     try
       res = fit_profile_generic(r, rho, profile_name, r_cut, r_max);
 
-      % skip underdetermined fits
-      if res.dof < 1 || isinf(res.log_rss) || isnan(res.log_rss)
-        rss_list(i)  = Inf;
-        chi2_list(i) = Inf;
-        rmse_list(i) = Inf;
-      else
-        rss_list(i)  = res.log_rss;
-        chi2_list(i) = res.chi2_red;
-        rmse_list(i) = res.rmse;
+      if res.dof < 1 || any(~isfinite([res.log_rss, res.rmse, res.chi2_red]))
+        continue
       end
 
+      stats.rss(i)      = res.log_rss;
+      stats.chi2(i)     = res.chi2_red;
+      stats.rmse(i)     = res.rmse;
+      stats.R2(i)       = res.R2;
+      stats.maxresid(i) = res.max_resid;
+      stats.AIC(i)      = res.AIC;
+      stats.BIC(i)      = res.BIC;
+
     catch
-      rss_list(i)  = Inf;
-      chi2_list(i) = Inf;
-      rmse_list(i) = Inf;
+      continue
     end
   end
 
-  % --- select best m by chi2_red ---
-  [best_chi2, idx] = min(chi2_list);
-  best_m           = m_values(idx);
+  switch selection_metric
+    case "chi2"
+      metric_list = stats.chi2;
+      [best_score, idx] = min(metric_list);
+      metric_label = 'chi2_red';
 
-  fprintf('\n--- find_best_m: %s ---\n',               profile_name);
-  fprintf('  Best m      = %.2f\n',                    best_m);
-  fprintf('  r_cut       = %.4f kpc\n',                best_m * rc);
-  fprintf('  chi2_red    = %.4f\n',                    best_chi2);
-  fprintf('  log-RSS     = %.4e\n',                    rss_list(idx));
-  fprintf('  RMSE        = %.4f dex\n',                rmse_list(idx));
+    case "rmse"
+      metric_list = stats.rmse;
+      [best_score, idx] = min(metric_list);
+      metric_label = 'RMSE';
+
+    case "rss"
+      metric_list = stats.rss;
+      [best_score, idx] = min(metric_list);
+      metric_label = 'log-RSS';
+
+    case "aic"
+      metric_list = stats.AIC;
+      [best_score, idx] = min(metric_list);
+      metric_label = 'AIC';
+
+    case "bic"
+      metric_list = stats.BIC;
+      [best_score, idx] = min(metric_list);
+      metric_label = 'BIC';
+
+    case "maxresid"
+      metric_list = stats.maxresid;
+      [best_score, idx] = min(metric_list);
+      metric_label = 'max residual';
+
+    case "r2"
+      metric_list = stats.R2;
+      [best_score, idx] = max(metric_list);
+      metric_label = 'R^2';
+
+    otherwise
+      error(['Unknown SelectionMetric: %s. Use ''chi2'', ''rmse'', ''rss'', ', ...
+             '''aic'', ''bic'', ''maxresid'', or ''r2''.'], selection_metric);
+  end
+
+  if ~isfinite(best_score)
+    best_m = NaN;
+    warning('find_best_m: no valid fit found for profile %s in the supplied m_range.', profile_name);
+    return
+  end
+
+  best_m = m_values(idx);
+
+  if opt.Verbose
+    fprintf('\n--- find_best_m: %s ---\n', profile_name);
+    fprintf('  Selection   = %s\n', metric_label);
+    fprintf('  Best m      = %.2f\n', best_m);
+    fprintf('  r_cut       = %.4f kpc\n', best_m * rc);
+    fprintf('  chi2_red    = %.4f\n', stats.chi2(idx));
+    fprintf('  log-RSS     = %.4e\n', stats.rss(idx));
+    fprintf('  RMSE        = %.4f dex\n', stats.rmse(idx));
+    fprintf('  R^2         = %.4f\n', stats.R2(idx));
+    fprintf('  max_resid   = %.4f dex\n', stats.maxresid(idx));
+    fprintf('  AIC         = %.4f\n', stats.AIC(idx));
+    fprintf('  BIC         = %.4f\n', stats.BIC(idx));
+  end
 end
