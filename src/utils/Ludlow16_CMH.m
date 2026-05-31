@@ -26,21 +26,21 @@ function Mcoll = Ludlow16_CMH(z, M0, f, cosmo)
 %
 %   Reference: Ludlow et al. 2016, MNRAS 460, 1214, eq.(3)
 
-delta_sc0 = 1.26;                        % collapse threshold (footnote 4)
+    delta_sc0 = 1.686;                        % collapse threshold (footnote 4)
 
-% D0 = growth_factor_D(0, cosmo);
-% Dz = growth_factor_D(z, cosmo);
-D0 = cosmo.D(0);
-Dz = cosmo.D(z);
+    % D0 = growth_factor_D(0, cosmo);
+    % Dz = growth_factor_D(z, cosmo);
+    D0 = cosmo.D(0);
+    Dz = cosmo.D(z);
 
-delta0    = delta_sc0 ./ D0;             % at z0=0
-deltaz    = delta_sc0 ./ Dz;            % at redshift z
+    delta0    = delta_sc0 ./ D0;             % at z0=0
+    deltaz    = delta_sc0 ./ Dz;            % at redshift z
 
-sigma_fM0 = cosmo.sigmaM(f * M0, 0);
-sigma_M0  = cosmo.sigmaM(M0, 0);
+    sigma_fM0 = cosmo.sigmaM(f * M0, 0);
+    sigma_M0  = cosmo.sigmaM(M0, 0);
 
-denom     = sqrt(2 * (sigma_fM0^2 - sigma_M0^2));
-arg       = (deltaz - delta0) ./ denom;
+    denom     = sqrt(2 * (sigma_fM0^2 - sigma_M0^2));
+    arg       = (deltaz - delta0) ./ denom;
 
-Mcoll     = M0 .* erfc(arg);
+    Mcoll     =  erfc(arg); % M0 .*
 end

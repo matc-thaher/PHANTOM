@@ -44,10 +44,14 @@ function [rho, rhos, rs, fc] = Einasto_profile(r, M, c, z, cosmo, Delta)
 %     Merritt et al. 2006, AJ, 132, 2685
 %     Gao et al. 2008, MNRAS, 387, 536  [alpha_e(nu) fitting formula, eq. 5]
 
-    % ---- Peak-height nu(M,z) ----------------------------------------
-    % Requires cosmo.nu to be a function handle: nu = cosmo.nu(M,z)
-    nu = cosmo.nu(M, z);
+    % ---- Convert M to Mvir for Gao+2008 nu_vir (Colossus convention) --------
+    % Colossus always uses nu_vir for alpha_e regardless of input mdef.
+    % We convert M_Delta -> Mvir using change_mass_definition with NFW profile.
+    [Mvir, ~, ~] = change_mass_definition(M, c, z, Delta, 'c', 0, 'vir', cosmo);
 
+    % ---- Peak-height nu using Mvir (matches Colossus convention) ----
+    nu      = cosmo.nu(Mvir, z);
+    
     % ---- Gao+2008 shape parameter (eq. 5) ---------------------------
     % alpha_e = 0.155 + 0.0095 * nu^2
     % Capped at 0.3: Gao+2008 did not constrain nu >> 3.5, and
@@ -55,7 +59,7 @@ function [rho, rhos, rs, fc] = Einasto_profile(r, M, c, z, cosmo, Delta)
     alpha_e = min(0.155 + 0.0095 .* nu.^2, 0.3);
 
     % ---- Critical density at redshift z -----------------------------
-    rho_c   = cosmo.rhocrit0 .* cosmo.E(z).^2;
+    rho_c   = cosmo.rho_crit0 .* cosmo.E(z).^2;
 
     % ---- Virial / overdensity radius and scale radius ---------------
     R_Delta = (3 .* M ./ (4 .* pi .* Delta .* rho_c)).^(1/3);

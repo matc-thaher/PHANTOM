@@ -1,4 +1,4 @@
-function comp = soliton_nfw_analytic(rho0_sol, rc_sol, Mvir, Rvir, c_nfw, r)
+function comp = soliton_nfw_analytic(rho0_sol, rc_sol, Mvir, Rvir, c_nfw, r, plot_fig)
 % SOLITON_NFW_ANALYTIC  Analytic soliton + NFW composite FDM profile.
 %
 %   comp = soliton_nfw_analytic(rho0_sol, rc_sol, Mvir, Rvir, c_nfw, r)
@@ -22,6 +22,9 @@ function comp = soliton_nfw_analytic(rho0_sol, rc_sol, Mvir, Rvir, c_nfw, r)
 %   c_nfw    : NFW concentration               [dimensionless]
 %   r        : radii for output profile        [kpc], column or row vector
 %
+% options (optional):
+%   plot_fig : True or false   ,   if the user want a plot
+%
 % OUTPUTS  (struct)
 %   comp.r_x                 : transition radius              [kpc]
 %   comp.rho_x               : density at r_x                 [M_sun/kpc^3]
@@ -40,6 +43,11 @@ function comp = soliton_nfw_analytic(rho0_sol, rc_sol, Mvir, Rvir, c_nfw, r)
 %   Navarro, Frenk & White 1997, ApJ 490, 493              (NFW profile)
 %   Schive+2014 PRL 113 261302, Eq.(3)                     (composite rule)
 % --------------------------------------------------------------------------
+    
+    % ---- Optional plot flag ------------------------------------------
+    if nargin < 7 || isempty(plot_fig)
+        plot_fig = false;
+    end
 
     r = r(:);   % force column vector
 
@@ -172,23 +180,25 @@ function comp = soliton_nfw_analytic(rho0_sol, rc_sol, Mvir, Rvir, c_nfw, r)
     comp.intersection_found  = found_flag;
     comp.intersection_method = used_intersection_method;
 
-    % ------------------------------------------------------------------
-    % Plot
-    % ------------------------------------------------------------------
-    figure;
-    loglog(r, rho_sol,       'b--', 'LineWidth', 1.5, ...
+    if plot_fig
+        % ------------------------------------------------------------------
+        % Plot
+        % ------------------------------------------------------------------
+        figure;
+        loglog(r, rho_sol,       'b--', 'LineWidth', 1.5, ...
            'DisplayName', 'Soliton (analytic)');
-    hold on;
-    loglog(r, rho_nfw,       'r--', 'LineWidth', 1.5, ...
+        hold on;
+        loglog(r, rho_nfw,       'r--', 'LineWidth', 1.5, ...
            'DisplayName', 'NFW (analytic)');
-    loglog(r, rho_composite, 'g-',  'LineWidth', 2.5, ...
+        loglog(r, rho_composite, 'g-',  'LineWidth', 2.5, ...
            'DisplayName', 'Composite');
-    plot(r_x, rho_x, 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'y', ...
+        plot(r_x, rho_x, 'ko', 'MarkerSize', 10, 'MarkerFaceColor', 'y', ...
          'DisplayName', sprintf('r_x = %.3f kpc', r_x));
-    xlabel('Radius [kpc]', 'FontSize', 14);
-    ylabel('Density [M_{sun}/kpc^3]', 'FontSize', 14);
-    legend('Location', 'southwest');
-    title(sprintf('Analytic Composite: c = %.1f,  r_c = %.3f kpc', ...
+        xlabel('Radius [kpc]', 'FontSize', 14);
+        ylabel('Density [M_{sun}/kpc^3]', 'FontSize', 14);
+        legend('Location', 'southwest');
+        title(sprintf('Analytic Composite: c = %.1f,  r_c = %.3f kpc', ...
                   c_nfw, rc_sol));
-    grid on;
+        % grid on;
+    end
 end

@@ -80,15 +80,21 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     r = r(:);
 
     % ---- Mean matter density at z ---------------------------------------
-    rho_m = cosmo.rho_m0 .* (1 + z).^3;
+    rho_m_z  = cosmo.rhom(z);          % mean matter density at z
 
     % ---- R_200m and nu_200m  --------------------------------------------
     % Needed to calibrate rt (DK14 eq. 6 was calibrated for nu_200m).
     % R_200m is computed as the overdensity radius at Delta = 200 w.r.t.
     % critical, consistent with M being M_200m.
-    rho_c    = cosmo.rhocrit0 .* cosmo.E(z).^2;
-    R200m    = (3 .* M ./ (4 .* pi .* Delta .* rho_c)).^(1/3);
-    nu200m   = cosmo.nu(M, z);          % peak height at M_200m
+    % rho_c    = cosmo.rhocrit(z); %cosmo.rho_crit0 .* cosmo.E(z).^2;
+    % R200m    = (3 .* M ./ (4 .* pi .* Delta .* rho_c)).^(1/3);
+    % R200m    = (3 .* M ./ (4 .* pi .* 200 .* rho_m_z)).^(1/3);   % true R200m
+
+    % M200m approximation for nu calibration (DK14 eq.6 uses nu_200m)
+    % M200m_approx = M .* (rho_m_z ./ rho_c);
+    % Exact M200c -> M200m conversion via NFW profile (no Colossus needed)
+    [M200m, R200m, ~] = change_mass_definition(M, c, z, Delta, 'c', 200, 'm', cosmo);
+    nu200m            = cosmo.nu(M200m, z);    % peak height at M_200m
 
     % ---- Derive beta, gamma_t, rt  (Colossus deriveParameters logic) ----
     %
@@ -121,6 +127,8 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     % ---- Inner Einasto profile  (delegates to Einasto_profile.m) --------
     % alpha_e is computed inside via Gao+2008: alpha_e = 0.155+0.0095*nu^2
     [rho_inner, ~, ~] = Einasto_profile(r, M, c, z, cosmo, Delta);
+    % Inside DK14_profile.m, replace the Einasto call with:
+    % [rho_inner, ~, ~] = Einasto_profile(r, M200m, c_new, z, cosmo, 200, '200m');
 
     % ---- Truncation (splashback) function --------------------------------
     % f_trans(r) = [ 1 + (r/rt)^beta ]^(-gamma_t/beta)
@@ -129,13 +137,13 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     %   r >> rt : f_trans -> 0       (sharp suppression)
     f_trans = (1 + (r ./ rt).^beta).^(-gamma_t ./ beta);
 
-    % ---- Outer power-law (infalling) term --------------------------------
-    % rho_outer = rho_m * (r)^(-s_e)
-    % b_e * r_ref^s_e are absorbed into rho_m by convention (b_e ~ 1,
-    % r_ref = 1 Mpc/h so the factor is unity in these units).
-    rho_outer = rho_m .* (r).^(-s_e);
+    % % ---- Outer power-law (infalling) term --------------------------------
+    % % rho_outer = rho_m * (r)^(-s_e)
+    % % b_e * r_ref^s_e are absorbed into rho_m by convention (b_e ~ 1,
+    % % r_ref = 1 Mpc/h so the factor is unity in these units).
+    % rho_outer = rho_m .* (r).^(-s_e);
 
     % ---- Total DK14 profile ---------------------------------------------
-    rho = rho_inner .* f_trans + rho_outer;
+    rho = rho_inner .* f_trans; % + rho_outer;
 
 end

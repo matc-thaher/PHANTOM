@@ -66,7 +66,148 @@
                 % Optional effective transfer function, only for plotting/diagnostics
                 cosmo.T = @(k) sqrt(cosmo.Pk0(k) ./ k.^cosmo.ns);
 
-            otherwise  % default: EH98 zero-baryon
+            case 'viel05'
+                % Warm dark matter transfer function (Viel+2005)
+                % Required: cosmo.m_wdm_keV (thermal relic mass in keV), but we set
+                % a default if missing (see below).
+                if ~isfield(cosmo,'m_wdm_keV') || isempty(cosmo.m_wdm_keV)
+                    warning(['transfer_model = ''viel05'': cosmo.m_wdm_keV not provided. ', ...
+                        'Using default m_wdm_keV = 3.0 keV.']);
+                    cosmo.m_wdm_keV = 3.0;
+                end
+
+                % Base CDM transfer for WDM (choose EH98 for now)
+                if ~isfield(cosmo,'viel05_base') || isempty(cosmo.viel05_base)
+                    cosmo.viel05_base = 'eh98';
+                end
+
+                switch lower(cosmo.viel05_base)
+                    case 'eh98'
+                        base_T = @(k) T_EH98(k, cosmo);
+
+                    case 'eh98_full'
+                        base_T = @(k) T_EH98_full(k, cosmo);
+
+                    case 'sugiyama95'
+                        base_T = @(k) T_Sugiyama95(k, cosmo);
+
+                    otherwise
+                        error('Unknown viel05_base ''%s''. Use eh98, eh98_full, sugiyama95, viel05, or bode01.', ...
+                        cosmo.viel05_base);
+                end
+
+                % Suppression transfer T_WDM(k)
+                supp_T  = @(k) T_wdm(k, cosmo.m_wdm_keV, cosmo, 'viel');
+
+                % Total transfer: T_tot = T_WDM * T_base
+                cosmo.T = @(k) T_total_suppressed(k, base_T, supp_T);
+
+            case 'bode01'
+                % Warm dark matter transfer function (Bode, Ostriker & Turok 2001)
+                if ~isfield(cosmo,'m_wdm_keV') || isempty(cosmo.m_wdm_keV)
+                    warning(['transfer_model = ''bode01'': cosmo.m_wdm_keV not provided. ', ...
+                        'Using default m_wdm_keV = 3.0 keV.']);
+                    cosmo.m_wdm_keV = 3.0;
+                end
+
+                % Base CDM transfer for WDM (choose EH98 for now)
+                if ~isfield(cosmo,'bode01_base') || isempty(cosmo.bode01_base)
+                    cosmo.bode01_base = 'eh98';
+                end
+
+                switch lower(cosmo.bode01_base)
+                    case 'eh98'
+                        base_T = @(k) T_EH98(k, cosmo);
+
+                    case 'eh98_full'
+                        base_T = @(k) T_EH98_full(k, cosmo);
+
+                    case 'sugiyama95'
+                        base_T = @(k) T_Sugiyama95(k, cosmo);
+
+                    otherwise
+                        error('Unknown bode01_base ''%s''. Use eh98, eh98_full, sugiyama95, viel05, or bode01.', ...
+                        cosmo.bode01_base);
+                end
+
+                % Suppression transfer T_WDM(k)
+                supp_T  = @(k) T_wdm(k, cosmo.m_wdm_keV, cosmo, 'bode');
+
+                % Total transfer: T_tot = T_WDM * T_base
+                cosmo.T = @(k) T_total_suppressed(k, base_T, supp_T);
+            
+            case 'schive25'
+                % Fuzzy DM transfer (Schive 2025 / Hu+2000 form).
+                % m22 = m / (1e-22 eV); default to 1 if not provided.
+                if ~isfield(cosmo,'m22') || isempty(cosmo.m22)
+                    warning(['transfer_model = ''schive25'': cosmo.m22 not provided. ', ...
+                        'Using default m22 = 1.0 (m = 1e-22 eV).']);
+                    cosmo.m22 = 1.0;
+                end
+
+                % Base CDM transfer model for Schive25.
+                % User can choose via cosmo.schive25_base, with options:
+                %   'eh98'      -> T_EH98
+                %   'eh98_full' -> T_EH98_full
+                %   'sugiyama95'-> T_Sugiyama95
+                %
+                % Default: 'eh98'.
+                if ~isfield(cosmo,'schive25_base') || isempty(cosmo.schive25_base)
+                    cosmo.schive25_base = 'eh98';
+                end
+
+                switch lower(cosmo.schive25_base)
+                    case 'eh98'
+                        base_T = @(k) T_EH98(k, cosmo);
+
+                    case 'eh98_full'
+                        base_T = @(k) T_EH98_full(k, cosmo);
+
+                    case 'sugiyama95'
+                        base_T = @(k) T_Sugiyama95(k, cosmo);
+
+                    otherwise
+                        error('Unknown schive25_base ''%s''. Use eh98, eh98_full, sugiyama95, viel05, or bode01.', ...
+                        cosmo.schive25_base);
+                end
+                
+                % Suppression transfer T_WDM(k)
+                supp_T  = @(k) T_Schive25(k, cosmo.m22);
+
+                % Total transfer: T(k) = T_FDM(k) * T_base(k),
+                % with T_FDM from Schive/ Hu+2000.
+                cosmo.T = @(k) T_total_suppressed(k, base_T, supp_T);
+
+           case 'axioncamb'
+                % AxionCAMB z=0 matter power spectrum from a precomputed .dat file
+                % User must provide cosmo.axioncamb_file with full path to the .dat
+                if ~isfield(cosmo,'axioncamb_file') || isempty(cosmo.axioncamb_file)
+                    error(['For transfer_model = ''axioncamb'', provide cosmo.axioncamb_file ', ...
+                        'pointing to params_axion_..._matterpower.dat.']);
+                end
+
+                data = load(cosmo.axioncamb_file);
+                if size(data,2) < 2
+                    error('axioncamb_file must have at least two columns [k, P(k)].');
+                end
+
+                k_ax  = data(:,1);   % [h/Mpc] or [1/Mpc], consistent with your k convention
+                P_ax  = data(:,2);   % linear matter P(k) at z=0
+
+                % Store tables
+                cosmo.k_axioncamb     = k_ax;
+                cosmo.Pk0_axioncamb   = P_ax;
+
+                % Interpolated z=0 power spectrum (no extra sigma8 renormalization)
+                cosmo.Pk0 = @(k) interp1(log(k_ax), P_ax, ...
+                    min(max(log(k(:)), log(k_ax(1))), log(k_ax(end))), ...
+                    'pchip');
+
+                % Define an effective transfer function for diagnostics; not used in Pk0
+                cosmo.T = @(k) sqrt(cosmo.Pk0(k) ./ k.^cosmo.ns);
+
+
+           otherwise  % default: EH98 zero-baryon
                 cosmo.T = @(k) T_EH98(k, cosmo);
         end
 
@@ -93,7 +234,7 @@
         % % Normalize P(k) to sigma8
         % A = normalize_A_to_sigma8(cosmo);
         % cosmo.Pk0 = @(k) A * cosmo.Pk0_unnorm(k);
-        if ~strcmpi(cosmo.transfer_model,'camb')
+        if ~strcmpi(cosmo.transfer_model,'camb') && ~strcmpi(cosmo.transfer_model,'axioncamb')
             cosmo.Pk0_unnorm = @(k) k.^cosmo.ns .* cosmo.T(k).^2;
             A = normalize_A_to_sigma8(cosmo);
             cosmo.Pk0 = @(k) A * cosmo.Pk0_unnorm(k);

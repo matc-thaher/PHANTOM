@@ -22,7 +22,7 @@ function [rho, rhos, rs, fc] = Hernquist_profile(r, M, c, z, cosmo, Delta)
 %
 %   Reference: Hernquist 1990, ApJ 356, 359
 
-rho_c   = cosmo.rhocrit0 * cosmo.E(z)^2;
+rho_c   = cosmo.rho_crit0 * cosmo.E(z)^2;
 R_Delta = (3*M / (4*pi * Delta * rho_c))^(1/3);
 rs      = R_Delta / c;
 

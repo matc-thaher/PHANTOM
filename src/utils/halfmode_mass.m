@@ -20,7 +20,7 @@ function M_hm = halfmode_mass(model, varargin)
         case 'WDM'
             m_WDM = varargin{1};
             cosmo  = varargin{2};
-            Om_WDM = cosmo.Om0 - cosmo.Ob0;
+            Om_WDM = cosmo.Omega_m - cosmo.Omega_b;
             h      = cosmo.h;
             % Eq. 5: effective free-streaming length [Mpc/h]
             alpha_fs  = 0.049 * (m_WDM)^(-1.11) ...
@@ -30,7 +30,7 @@ function M_hm = halfmode_mass(model, varargin)
             mu        = 1.12;
             lambda_hm = 2*pi * alpha_fs * (2^(mu/5) - 1)^(-1/(2*mu));
             % Eq. 9: half-mode mass [h^-1 M_sun]
-            rho_m = cosmo.Om0 * cosmo.rho_crit0;
+            rho_m = cosmo.rho_m0;
             M_hm  = (4*pi/3) * rho_m * (lambda_hm/2)^3;
 
         case 'FDM'

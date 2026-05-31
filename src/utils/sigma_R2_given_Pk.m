@@ -23,6 +23,17 @@ switch lower(cosmo.transfer_model)
 
         lnk_min = log(k_min * 1.001);   % stay just inside table
         lnk_max = log(k_max * 0.999);
+
+    case 'axioncamb'
+        if ~isfield(cosmo,'k_axioncamb') || isempty(cosmo.k_axioncamb)
+            error(['cosmo.k_axioncamb is missing. ' ...
+                   'Call attach_linear_components(cosmo) with transfer_model=''axioncamb'' first.']);
+        end
+        k_min  = min(cosmo.k_axioncamb);
+        k_max  = max(cosmo.k_axioncamb);
+        lnk_min = log(k_min * 1.001);   % stay just inside table
+        lnk_max = log(k_max * 0.999);
+        
     otherwise
         lnk_min = log(1e-6);
         lnk_max = log(1e4);

@@ -6,7 +6,7 @@ function c_sup = suppression_factor(M, M_half, model, varargin)
 %   c_sup = suppression_factor(M, M_half, 'laroche22')    % Laroche et al. (2022)
 %   c_sup = suppression_factor(M, M_half, 'dentler22')    % Dentler et al. (2022)
 %   c_sup = suppression_factor(M, M_half, 'schneider12')  % Schneider et al. (2012)
-%   c_sup = suppression_factor(M, [], 'ludlow16', z_obs, m_WDM_keV, cosmo)
+%   c_sup = suppression_factor(M, [], 'mah_wdm', z_obs, m_WDM_keV, cosmo)
 %
 % Inputs:
 %   M       - Halo mass [M_sun], scalar or array
@@ -96,7 +96,7 @@ switch lower(model)
         gamma2 = 0.3;
         c_sup  = (1 + gamma1 .* (M_half ./ M)).^(-gamma2);
 
-   case 'ludlow16'
+   case 'mah_wdm'
         % Ludlow et al. (2016) physically motivated WDM concentration
         % suppression. Calls Ludlow16.m twice — once with CDM sigmaM and
         % once with a WDM-modified sigmaM — and returns c_WDM / c_CDM.
@@ -130,11 +130,11 @@ switch lower(model)
         tf_args = varargin(4:end);
 
         % --- Build WDM cosmo: only sigmaM is modified --------------------
-        rho_m0 = cosmo_cdm.Om0 * cosmo_cdm.rho_crit0;   % [M_sun/h / (Mpc/h)^3]
+        rho_m0 = cosmo_cdm.Omega_m * cosmo_cdm.rho_crit0;   % [M_sun/h / (Mpc/h)^3]
 
         cosmo_wdm        = cosmo_cdm;
         cosmo_wdm.sigmaM = @(M_in, z_in) ...
-            compute_sigmaM_wdm(M_in, z_in, cosmo_cdm, m_WDM_keV, rho_m0, tf_args);
+            sigmaM_WDM(M_in, z_in, cosmo_cdm, m_WDM_keV, tf_args{:});
 
         % --- Solve c for CDM and WDM -------------------------------------
         c_cdm = Ludlow16(M, z_obs, cosmo_cdm);

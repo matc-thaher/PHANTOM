@@ -17,12 +17,12 @@ function c = c_CDM(M, z, model, varargin)
 %   MODELS & SIGNATURES
 %   -------------------
 %   Simple fits — no cosmo needed:
-%     'bullock01'   Bullock et al.  2001  — c = c_CDM(M, z, 'bullock01')
 %     'duffy08'     Duffy   et al.  2008  — c = c_CDM(M, z, 'duffy08',  cosmo, mode)
 %     'klypin11'    Klypin  et al.  2011  — c = c_CDM(M, z, 'klypin11', cosmo, mode)
 %     'prada12'     Prada   et al.  2012  — c = c_CDM(M, z, 'prada12',  cosmo)
 %
 %   Physics-based fits — cosmo required:
+%     'bullock01'   Bullock et al.  2001  — c = c_CDM(M, z, 'bullock01', cosmo)
 %     'dutton14'    Dutton & Maccio 2014  — c = c_CDM(M, z, 'dutton14',   cosmo, mode)
 %     'diemer15'    Diemer & Kravtsov 2015— c = c_CDM(M, z, 'diemer15',   cosmo, mode)
 %     'ludlow16'    Ludlow  et al.  2016  — c = c_CDM(M, z, 'ludlow16',   cosmo)
@@ -166,19 +166,57 @@ switch lower(model)
         [cosmo, ~] = parse_args(varargin, '', 'ludlow16');
         c = Ludlow16(M, z, cosmo);
 
+    case {'ludlow16_fit', 'l16_fit'}
+        [cosmo, ~] = parse_args(varargin, '', 'ludlow16_fit');
+        c = Ludlow16_fit(M, z, cosmo);
     % ================================================================
     % Klypin et al. 2016
     % mode string: 'cosmo_name_mdef_formula'
     % defaults:     planck13    200c   cM
     % e.g. 'planck13_200c_cM' | 'bolshoi_vir_cnu'
     % ================================================================
+    % case {'klypin16', 'k16'}
+    %     % [cosmo, mode] = parse_args(varargin, 'planck13_200c_cM', 'klypin16');
+    %     % parts       = strsplit(mode, '_');
+    %     % cosmo_name  = parts{1};          % planck13 | bolshoi
+    %     % mdef_k16    = parts{2};          % 200c | vir
+    %     % formula     = parts{3};          % cM | cnu
+    %     % [c, ~]      = Klypin16(M, z, cosmo, cosmo_name, mdef_k16, formula);
+    %     [cosmo, cosmo_name, mdef_k16, formula] = parse_args(varargin, ...
+    %                                          'planck13', '200c', 'cM', 'klypin16');
+    %     [c, ~] = Klypin16(M, z, cosmo, cosmo_name, mdef_k16, formula);
     case {'klypin16', 'k16'}
-        [cosmo, mode] = parse_args(varargin, 'planck13_200c_cM', 'klypin16');
-        parts       = strsplit(mode, '_');
-        cosmo_name  = parts{1};          % planck13 | bolshoi
-        mdef_k16    = parts{2};          % 200c | vir
-        formula     = parts{3};          % cM | cnu
-        [c, ~]      = Klypin16(M, z, cosmo, cosmo_name, mdef_k16, formula);
+        % Extract cosmo struct — parse_args only handles one mode string,
+        % so we parse the remaining args manually here.
+        [cosmo, ~] = parse_args(varargin, '', 'klypin16');
+
+        % Defaults
+        cosmo_name = 'planck13';
+        mdef_k16   = '200c';
+        formula    = 'cM';
+
+        % Read remaining varargin entries (skip cosmo struct if present)
+        extra = varargin;
+        if ~isempty(extra) && isstruct(extra{1})
+            extra = extra(2:end);   % remove cosmo struct from front
+        end
+
+        % Match each string to its parameter by content
+        for i = 1:numel(extra)
+            v = extra{i};
+            if ~ischar(v), continue; end
+            if any(strcmp(v, {'planck13','bolshoi'}))
+                cosmo_name = v;
+            elseif any(strcmp(v, {'200c','vir'}))
+                mdef_k16 = v;
+            elseif any(strcmp(v, {'cM','cnu'}))
+                formula = v;
+            else
+                error('c_CDM klypin16: unrecognised argument "%s".', v);
+            end
+        end
+
+        [c, ~] = Klypin16(M, z, cosmo, cosmo_name, mdef_k16, formula);
 
     % ================================================================
     % Child et al. 2018

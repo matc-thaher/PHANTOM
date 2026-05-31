@@ -45,12 +45,18 @@ function sigma = sigmaM_WDM(M, z, cosmo_cdm, m_WDM_keV, varargin)
 %
 % See also: transfer_function_WDM, Ludlow16, suppression_factor
 
-    rho_m0 = cosmo_cdm.Om0 * cosmo_cdm.rho_crit0;   % [M_sun/h / (Mpc/h)^3]
+    if isempty(varargin)
+        varargin = {'viel05'};
+    end
+
+    rho_m0 = cosmo_cdm.Omega_m * cosmo_cdm.rho_crit0;   % [M_sun/h / (Mpc/h)^3]
 
     R     = (3 .* M ./ (4 * pi * rho_m0)).^(1/3);   % Lagrangian radius [Mpc/h]
     k_eff = 1.0 ./ R;                                 % effective wavenumber [h/Mpc]
 
-    T     = wdm_transfer(k_eff, m_WDM_keV, cosmo_cdm, varargin{:});
+    T     = T_wdm(k_eff, m_WDM_keV, cosmo_cdm, varargin{:});
 
     sigma = cosmo_cdm.sigmaM(M, z) .* T;
+    % Guard: T can go slightly negative at extreme k; clamp sigma to real positive
+    sigma = max(real(sigma), 0);
 end

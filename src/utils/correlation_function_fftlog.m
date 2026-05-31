@@ -27,7 +27,7 @@ function xi = correlation_function_fftlog(R, z, cosmo, Pk_handle)
     D2 = (cosmo.D(z) / cosmo.D(0)).^2;
 
     % FFTLog settings
-    N    = 2048;
+    N    = 4096;
     kmin = 1e-6;
     kmax = 1e4;
     q    = 0.0;
@@ -53,7 +53,13 @@ function xi = correlation_function_fftlog(R, z, cosmo, Pk_handle)
 
     % Input sequence for Hankel transform
     Pk = Pk_handle(k) .* D2;
-    A  = k.^(1.5) .* Pk;
+
+    % HIGH-kR DAMPING: suppress the high-k tail using the central output
+    % scale r0 as representative.  This mirrors the Colossus exponential
+    % suppression at kR > 1000 and reduces ringing at large output radii.
+    kR_cut = 350.0;
+    w = exp(-(k .* r0 ./ kR_cut).^2);
+    A  = k.^(1.5) .* Pk .* w;
 
     % FFTLog transform
     B = fftlog_fht(A, mu, q, dln, kr);
@@ -62,7 +68,26 @@ function xi = correlation_function_fftlog(R, z, cosmo, Pk_handle)
     xi_grid = real(B) ./ (2*pi^2 .* r.^(1.5));
 
     % Interpolate to requested radii
-    xi = interp1(log(r), xi_grid, log(Rreq), 'pchip', 'extrap');
+    % xi = interp1(log(r), xi_grid, log(Rreq), 'pchip', 'extrap');
+    % --- Interpolate to requested radii ----------------------------------
+    % Guard: only interpolate within the reliable interior of the r-grid
+    %   (5% margin from each edge to avoid pchip extrapolation artefacts)
+    r_lo = r(max(1,  round(0.05*N)));
+    r_hi = r(min(N,  round(0.95*N)));
+
+    xi = zeros(size(Rreq));
+
+    % Interior: pchip on log(r)
+    in = (Rreq >= r_lo) & (Rreq <= r_hi);
+    if any(in)
+        xi(in) = interp1(log(r), xi_grid, log(Rreq(in)), 'pchip');
+    end
+
+    % Exterior: fall back to direct integral (avoids bad extrapolation)
+    out = ~in;
+    if any(out)
+        xi(out) = correlation_function_integral(Rreq(out), z, cosmo, Pk_handle);
+    end
 
     if isscalar(R)
         xi = xi(1);

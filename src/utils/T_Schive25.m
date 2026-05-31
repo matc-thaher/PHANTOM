@@ -1,4 +1,4 @@
-function [P_FDM, T_FDM] = fdm_transfer(k, m22, P_CDM)
+function [T_FDM, P_FDM] = T_Schive25(k, m22, P_CDM)
 % fdm_transfer   FDM linear matter power spectrum and transfer function.
 %
 % Implements Schive (2025, Living Reviews in Comp. Astrophysics),

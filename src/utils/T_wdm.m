@@ -1,4 +1,4 @@
-function T = wdm_transfer(k, m_WDM_keV, cosmo, model, varargin)
+function T = T_wdm(k, m_WDM_keV, cosmo, model, varargin)
 % transfer_function_WDM   WDM linear matter transfer function T(k)
 %
 %   T = transfer_function_WDM(k, m_WDM_keV, cosmo)
@@ -49,7 +49,7 @@ function T = wdm_transfer(k, m_WDM_keV, cosmo, model, varargin)
 
     switch lower(model)
 
-        case 'viel'
+        case {'viel', 'viel05'}
             % Viel, Lesgourgues, Haehnelt, Matarrese & Riotto (2005)
             % Phys. Rev. D 71, 063534, arXiv:astro-ph/0501562
             % Equations 6 and 7 (Section II, "Pure warm dark matter models")
@@ -66,11 +66,11 @@ function T = wdm_transfer(k, m_WDM_keV, cosmo, model, varargin)
             % the 'nu' option if you need a free shape parameter.
             mu    = 1.12;
             alpha = 0.049 * (m_WDM_keV)^(-1.11) ...
-                          * (cosmo.Om0 / 0.25)^(0.11) ...
+                          * (cosmo.Omega_m / 0.25)^(0.11) ...
                           * (cosmo.h   / 0.7 )^(1.22);   % [h^{-1} Mpc]
             T = (1 + (alpha .* k).^(2*mu)).^(-5/mu);
 
-        case 'bode'
+        case {'bode', 'bode01'}
             % Bode, Ostriker & Turok (2001), ApJ 556, 93
             % arXiv:astro-ph/0010389, Eq. 16
             %
@@ -91,7 +91,7 @@ function T = wdm_transfer(k, m_WDM_keV, cosmo, model, varargin)
             %   Bode+2001 use nu=1.12 in their Eq.16.
             %   Viel+2005 use nu=1.2 in MCMC analysis (their Sec.IVA).
             %   Pass via: transfer_function_WDM(..., 'nu', 1.2)
-            alpha = 0.048 * (cosmo.Om0 / 0.4 )^(0.15) ...
+            alpha = 0.048 * (cosmo.Omega_m / 0.4 )^(0.15) ...
                           * (cosmo.h   / 0.65)^(1.3)  ...
                           * (1.0 / m_WDM_keV)^(1.15)  ...
                           * (1.5 / g_eff)^(0.29);        % [h^{-1} Mpc]
