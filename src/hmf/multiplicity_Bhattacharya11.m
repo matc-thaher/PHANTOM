@@ -1,9 +1,9 @@
-function f = multiplicity_Bhattacharya11(sigma, z, delta_c)
+function f = multiplicity_Bhattacharya11(sigma, z, cosmo, delta_c)
 % Bhattacharya et al. (2011), ApJ 732, 122, Table 4
 % FOF, calibrated z = 0-2. Explicit z-dependence; delta_c without correction.
 % mass range 6e11-3e15 solar mass
     if nargin < 3 || isempty(delta_c)
-        delta_c = collapse_overdensity();   % paper uses uncorrected value
+        delta_c = collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo);   % paper uses uncorrected value
     end
     nu   = delta_c ./ sigma;
     nu2  = nu.^2;

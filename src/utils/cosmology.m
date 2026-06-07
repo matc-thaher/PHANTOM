@@ -220,5 +220,9 @@
 
         % % derived parameters:
         cosmo = derive_cosmo_params(cosmo);
+
+        %
+        cosmo.delta_c = @(z) collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo);
+        cosmo.nu      = @(M, z) cosmo.delta_c(z) ./ cosmo.sigmaM(M, z);
              
     end

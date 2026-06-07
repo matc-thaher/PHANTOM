@@ -41,25 +41,38 @@ end
 
 R   = R(:).';
 NR  = numel(R);
-s2  = zeros(1, NR);
 
-for i = 1:NR
-    Ri = R(i);
-    integrand = @(lnk) local_integrand(lnk, Ri, Pk_handle, D2, filter_name);
+% for i = 1:NR
+%     Ri = R(i);
+%     integrand = @(lnk) local_integrand(lnk, Ri, Pk_handle, D2, filter_name);
+% 
+%     s2(i) = (1/(2*pi^2)) * integral(integrand, lnk_min, lnk_max, ...
+%         'RelTol', 1e-4, ...
+%         'AbsTol', 0, ...
+%         'ArrayValued', true);
+% end
 
-    s2(i) = (1/(2*pi^2)) * integral(integrand, lnk_min, lnk_max, ...
-        'RelTol', 1e-4, ...
-        'AbsTol', 0, ...
-        'ArrayValued', true);
-end
+% ── vectorised matrix integral ─────
+Nk   = 1024;
+lnk  = linspace(lnk_min, lnk_max, Nk)';   % [Nk x 1]
+dlnk = lnk(2) - lnk(1);
+k    = exp(lnk);                            % [Nk x 1]
+Pk   = Pk_handle(k) * D2;                  % [Nk x 1]
+
+kR   = k * R;                              % [Nk x NR]  broadcast
+W    = variance_window(kR, filter_name);   % [Nk x NR]
+
+integrand = (Pk .* k.^3) .* W.^2;         % [Nk x NR]
+s2 = (1/(2*pi^2)) * sum(integrand, 1) * dlnk;   % [1 x NR]
+% ─────────────────────────────────────────────────────────────────────
 
 if isscalar(R), s2 = s2(1); end
 end
 
-% -----------------------------------------------------------------------
-function f = local_integrand(lnk, R, Pk_handle, D2, filter_name)
-    k  = exp(lnk);
-    Pk = Pk_handle(k) * D2;
-    W  = variance_window(k .* R, filter_name);
-    f  = Pk .* W.^2 .* k.^3;      % k^3 is the log-k Jacobian
-end
+% % -----------------------------------------------------------------------
+% function f = local_integrand(lnk, R, Pk_handle, D2, filter_name)
+%     k  = exp(lnk);
+%     Pk = Pk_handle(k) * D2;
+%     W  = variance_window(k .* R, filter_name);
+%     f  = Pk .* W.^2 .* k.^3;      % k^3 is the log-k Jacobian
+% end

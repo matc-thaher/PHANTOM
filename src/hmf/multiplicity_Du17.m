@@ -24,7 +24,7 @@ function f = multiplicity_Du17(sigma, M, z, m22, cosmo, delta_c)
 %   delta_c : (optional) CDM collapse threshold
 
     if nargin < 6 || isempty(delta_c)
-        delta_c = collapse_overdensity('corrections', true, 'z', z);
+        delta_c = collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo);
     end
 
     % Fitting parameters (Du+2017, Eq. 11; Marsh 2016)
@@ -33,7 +33,7 @@ function f = multiplicity_Du17(sigma, M, z, m22, cosmo, delta_c)
     a5 = 1.7;  a6 = 0.9;
 
     % Jeans mass M_J [h^-1 M_sun] (Du+2017, Eq. 14)
-    M_J = 1e8 * a1 * m22^(-3/2) * (cosmo.Om0 * cosmo.h^2 / 0.14)^(0.25);
+    M_J = 1e8 * a1 * m22^(-3/2) * (cosmo.Omega_m * cosmo.h^2 / 0.14)^(0.25);
 
     % Dimensionless mass variable x = M / M_J
     x = M ./ M_J;

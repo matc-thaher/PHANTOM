@@ -1,4 +1,4 @@
-function f = multiplicity_Despali16(sigma, Delta, Delta_vir, delta_c, ellipsoidal)
+function f = multiplicity_Despali16(sigma, z, mdef, cosmo,  delta_c, ellipsoidal)
 % Despali et al. (2016), MNRAS 456, 2486, Eq. 12
 % Universal ST-like form rescaled to any SO definition via Delta/Delta_vir.
 %
@@ -8,8 +8,11 @@ function f = multiplicity_Despali16(sigma, Delta, Delta_vir, delta_c, ellipsoida
 %   delta_c     : (optional) collapse overdensity
 %   ellipsoidal : (optional) use ellipsoidal halo finder params (default false)
 
-    if nargin < 4 || isempty(delta_c),    delta_c    = collapse_overdensity(); end
-    if nargin < 5 || isempty(ellipsoidal), ellipsoidal = false; end
+    if nargin < 5 || isempty(delta_c), delta_c = collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo); end
+    if nargin < 6 || isempty(ellipsoidal), ellipsoidal = false; end
+
+    Delta     = density_threshold(z, mdef, cosmo) ./ cosmo.rhocrit(z);
+    Delta_vir = density_threshold(z, 'vir', cosmo) ./ cosmo.rhocrit(z);
 
     x = log10(Delta / Delta_vir);
 

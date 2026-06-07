@@ -1,4 +1,4 @@
-function f = multiplicity_Schneider12(sigma, M, M_hm, z, delta_c, variant)
+function f = multiplicity_Schneider12(sigma, M, M_hm, z, cosmo, delta_c, variant)
 % Schneider et al. (2012), MNRAS 424, 684
 % WDM halo mass function for FIELD haloes.
 %
@@ -19,10 +19,10 @@ function f = multiplicity_Schneider12(sigma, M, M_hm, z, delta_c, variant)
 %
 % NOTE: For subhalo mass functions use multiplicity_Lovell14 instead.
 
-    if nargin < 5 || isempty(delta_c)
-        delta_c = collapse_overdensity('corrections', true, 'z', z);
+    if nargin < 6 || isempty(delta_c)
+        delta_c = collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo);
     end
-    if nargin < 6 || isempty(variant)
+    if nargin < 7 || isempty(variant)
         variant = 'A';
     end
 

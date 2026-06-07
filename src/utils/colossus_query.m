@@ -42,6 +42,20 @@ switch quantity
         task.M    = extra.M;
         task.c    = extra.c;
         task.mdef = extra.mdef;
+    case 'hmf'
+        task.M    = input_array(:)';
+        % mdef is resolved model-aware on the Python side.
+        % Pass explicitly only if you need to override the default.
+        % e.g. colossus_query('hmf', M, cosmo_id, 'tinker08', z, ..., struct('mdef','500c'))
+        if isfield(extra, 'mdef')
+            task.mdef = extra.mdef;
+        end
+        % model is already set from the model argument above
+    case 'delta_c'
+        task.z = z;   % z already set above; nothing else needed
+
+    case 'sigma_fof'
+    task.M = input_array(:)';
 end
 
 % Write JSON

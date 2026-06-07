@@ -7,5 +7,5 @@ function f = multiplicity_Courtin11(sigma)
     a = 0.695;
     p = 0.1;
     nu = delta_c ./ sigma;
-    f = A .* sqrt(a .* 2/pi) .* nu .* exp(-0.5.*nu^2 .* a) .* (1 + (nu.^2 .* a)^(-p));
+    f = A .* sqrt(a .* 2/pi) .* nu .* exp(-0.5.*nu.^2 .* a) .* (1 + (nu.^2 .* a).^(-p));
 end

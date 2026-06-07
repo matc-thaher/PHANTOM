@@ -1,4 +1,4 @@
-function f = multiplicity_Lovell14(sigma, M, M_hm, z, delta_c)
+function f = multiplicity_Lovell14(sigma, M, M_hm, z, cosmo, delta_c)
 % Lovell et al. (2014), MNRAS 439, 300
 % WDM suppression applied as a ratio to the CDM Sheth-Tormen f(sigma).
 %
@@ -15,8 +15,8 @@ function f = multiplicity_Lovell14(sigma, M, M_hm, z, delta_c)
 %
 % NOTE: M_hm = (4*pi/3)*rho_m * R_hm^3 where R_hm is where T_WDM^2 = 0.5
 
-    if nargin < 5 || isempty(delta_c)
-        delta_c = collapse_overdensity('corrections', true, 'z', z);
+    if nargin < 6 || isempty(delta_c)
+        delta_c = collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo);
     end
 
     beta   = 0.99; gamma = 2.7;

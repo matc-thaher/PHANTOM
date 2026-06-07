@@ -8,6 +8,8 @@ function f = multiplicity_Watson13(sigma, z, Delta_m, Om_z)
 %   Delta_m : overdensity w.r.t. mean (pass [] or omit for FOF mode)
 %   Om_z    : Omega_m(z); required for SO mode at 0 < z < 6
 
+    sigma = sigma(:);
+
     if nargin < 3 || isempty(Delta_m)
         % ---- FOF fit, Table 1, Eq. 12 ------------------------------------
         A     = 0.282;
@@ -34,6 +36,8 @@ function f = multiplicity_Watson13(sigma, z, Delta_m, Om_z)
         beta  = Om_z .* (3.136 .* (1+z).^-3.599 + 2.344);
         gamma = 1.318;
     end
+    
+
 
     f_178 = A .* ((beta./sigma).^alpha + 1) .* exp(-gamma./sigma.^2);
 

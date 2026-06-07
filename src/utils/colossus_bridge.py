@@ -89,7 +89,67 @@ def run(task_file, output_file):
               for k in ['nfw','einasto','hernquist','dk14']])
         np.savetxt(output_file, out, delimiter=',',
                header='r_kpch,nfw,einasto,hernquist,dk14', comments='')
-   
+
+    elif quantity == 'hmf':
+        from colossus.lss import mass_function as col_mf
+        M     = np.array(task['M'])
+        model = task.get('model', 'tinker08')
+
+        # mdef defaults depend on calibration: Tinker08 uses '200m',
+        # all FOF-based models (PS, ST, Crocce10, Watson13) use 'fof'.
+        # fof_models = {'press74', 'sheth99', 'crocce10', 'watson13',
+        #               'bhattacharya11', 'courtin11', 'angulo12', 'reed03', 'reed07'}
+        # default_mdef = 'fof' if model in fof_models else '200m'
+        mdef_overrides = {
+            'press74': 'fof',
+            'sheth99': 'fof',
+            'angulo12': 'fof',
+            'bhattacharya11': 'fof',
+            'crocce10': 'fof',
+            'watson13': 'fof',
+            'reed03': 'fof',
+            'reed07': 'fof',
+            'courtin11': 'fof',
+            'tinker08': '200m',
+            'comparat17': 'vir',
+            'rodriguezpuebla16': 'vir',
+            'yung24': 'vir',
+            'yung25': 'vir',
+        }
+        mdef = task.get('mdef', mdef_overrides.get(model, '200m'))
+        # mdef  = task.get('mdef', default_mdef)
+
+        mdef_overrides = {
+            'yung24': 'vir',
+            'yung25': 'vir',
+        }
+        if model in mdef_overrides:
+            mdef = mdef_overrides[model]
+
+        dndlnM = col_mf.massFunction(M, z, mdef=mdef, model=model,
+                                     q_out='dndlnM')
+        np.savetxt(output_file,
+                   np.column_stack([M, dndlnM]),
+                   header='M_Msun_h dndlnM_h3Mpc3', comments='')
+
+    elif quantity == 'delta_c':
+        from colossus.lss import peaks
+        corrections = task.get('corrections', True)
+        dc = peaks.collapseOverdensity(z=z, corrections=corrections)
+        np.savetxt(output_file,
+               np.array([[z, dc]]),
+               header='z delta_c', comments='')
+
+    elif quantity == 'sigma_fof':
+        from colossus.lss import peaks
+        M     = np.array(task['M'])
+        model = task.get('model', 'eisenstein98')
+        # Colossus sigma uses Lagrangian radius from M directly
+        R     = peaks.lagrangianR(M)
+        sig   = cosmo.sigma(R, z, ps_args={'model': model})
+        np.savetxt(output_file,
+               np.column_stack([M, sig]),
+               header='M_Msun_h sigma', comments='')
 
     else:
         raise ValueError(f"Unknown quantity: {quantity}")

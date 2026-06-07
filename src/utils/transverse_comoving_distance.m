@@ -3,7 +3,7 @@
 % =====================================================================
 function d = transverse_comoving_distance(z, cosmo)
 
-    dc = comoving_distance_internal(z, cosmo);
+    dc = comoving_distance(z, cosmo);
 
     if abs(cosmo.Omega_k) < 1e-12
         d = dc;

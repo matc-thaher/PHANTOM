@@ -1,4 +1,4 @@
-function f = multiplicity_Schive16(sigma, M, M_hm, z, delta_c, base_model)
+function f = multiplicity_Schive16(sigma, M, M_hm, z, cosmo, delta_c, base_model)
 % Schive et al. (2016), ApJ 818, 89, & Schive 2025
 % FDM (Fuzzy Dark Matter / Ultra-light axion) halo mass function.
 %
@@ -31,10 +31,10 @@ function f = multiplicity_Schive16(sigma, M, M_hm, z, delta_c, base_model)
 %   f    = multiplicity_FDM_Schive16(sigma, z, M, M_hm);
 
     
-    if nargin < 5 || isempty(delta_c)
-        delta_c = collapse_overdensity('corrections', true, 'z', z);
+    if nargin < 6 || isempty(delta_c)
+        delta_c = collapse_overdensity('corrections', true, 'z', z, 'cosmo', cosmo);
     end
-    if nargin < 6 || isempty(base_model)
+    if nargin < 7 || isempty(base_model)
         base_model = 'ST';
     end
 
