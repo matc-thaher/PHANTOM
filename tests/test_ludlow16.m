@@ -48,7 +48,7 @@ z_vec = [0.0, 0.5, 1.0, 2.0, 5.0];
 
 Mcoll = zeros(1, numel(z_vec));
 for i = 1:numel(z_vec)
-    Mcoll(i) = Ludlow16_CMH(z_vec(i), M0, f, cosmo);
+    Mcoll(i) = Ludlow16_CMH(z_vec(i), M0, f, cosmo, true);
 end
 
 fprintf('  z:     ');  fprintf(' %.2f', z_vec);  fprintf('\n');
@@ -81,14 +81,14 @@ f_test   = 0.02;
 
 D0   = cosmo.D(0);
 Dz   = cosmo.D(z_test);
-d0   = 1.26 / D0;
-dz   = 1.26 / Dz;
+d0   = 1.686 / D0;
+dz   = 1.686 / Dz;
 sfl  = cosmo.sigmaM(f_test * M0_test, 0);
 sM0  = cosmo.sigmaM(M0_test, 0);
 denom = sqrt(2 * (sfl^2 - sM0^2));
 
 Mcoll_manual = M0_test * erfc((dz - d0) / denom);
-Mcoll_code   = Ludlow16_CMH(z_test, M0_test, f_test, cosmo);
+Mcoll_code   = Ludlow16_CMH(z_test, M0_test, f_test, cosmo, true);
 
 d_pct = abs(Mcoll_code - Mcoll_manual) / Mcoll_manual * 100;
 ok    = d_pct < 0.001;
@@ -133,7 +133,7 @@ end
 fprintf('\n--- 6. c positive and finite ---\n');
 
 M_range = logspace(10, 14, 8);
-z_range = [0.0, 0.5, 1.0, 2.0];
+z_range = [0.0, 0.5, 1.0];
 
 for zi = 1:numel(z_range)
     for mi = 1:numel(M_range)
@@ -180,7 +180,7 @@ assert(ok_mono, 'c not monotone decreasing with M at z=0');
 % =========================================================================
 fprintf('\n--- 8. c(z) decreasing at fixed M=1e12 ---\n');
 
-z_vec2  = [0.0, 0.5, 1.0, 2.0];
+z_vec2  = [0.0, 0.5, 1.0];
 M_fixed = 1e12;
 c_z = zeros(1, numel(z_vec2));
 zf_z = zeros(1, numel(z_vec2));

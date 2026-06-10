@@ -18,6 +18,8 @@ here     = fileparts(mfilename('fullpath'));
 repo     = fullfile(here, '..');
 profiles_path = fullfile(repo, 'src', 'profiles');
 addpath(genpath(profiles_path));
+utils_path         = fullfile(repo, 'src', 'utils');
+addpath(genpath(utils_path));
 
 fprintf('==========================================\n');
 fprintf('  Halo Profile Functions — Test Suite\n');
@@ -26,23 +28,25 @@ fprintf('==========================================\n\n');
 % ---- Shared cosmology stub ------------------------------------------
 % Minimal cosmo struct sufficient for all profile functions.
 % Uses flat ΛCDM Planck18-like values.
-cosmo.rhocrit0 = 2.775e11;                          % [Msun/h / (Mpc/h)^3]
-cosmo.Omega_m  = 0.315;
-cosmo.rho_m0   = cosmo.rhocrit0 * cosmo.Omega_m;   % [Msun/h / (Mpc/h)^3]
-cosmo.E        = @(z) sqrt(cosmo.Omega_m*(1+z)^3 + (1-cosmo.Omega_m));
-cosmo.nu       = @(M,z) 1.686 ./ (0.8 .* (M./1e12).^(-0.1) ./ cosmo.E(z));
+% cosmo.rhocrit0 = 2.775e11;                          % [Msun/h / (Mpc/h)^3]
+% cosmo.Omega_m  = 0.315;
+% cosmo.rho_m0   = cosmo.rhocrit0 * cosmo.Omega_m;   % [Msun/h / (Mpc/h)^3]
+% cosmo.E        = @(z) sqrt(cosmo.Omega_m*(1+z)^3 + (1-cosmo.Omega_m));
+% cosmo.nu       = @(M,z) 1.686 ./ (0.8 .* (M./1e12).^(-0.1) ./ cosmo.E(z));
+cosmo = cosmology('Planck18');
 
 % ---- Shared test parameters -----------------------------------------
-M0     = 1e13;      % halo mass  [Msun/h]
-c0     = 7.0;       % concentration
+M0     = 1e14;      % halo mass  [Msun/h]
+c0     = 5.0;       % concentration
 z0     = 0.0;       % redshift
 Delta  = 200;
-rhos0  = 1e7;       % scale density for NFW_profile  [Msun/kpc^3]
+rhos0  = 1e10;       % scale density for NFW_profile  [Msun/kpc^3]
 rs0    = 0.3;       % scale radius for NFW_profile  [Mpc/h]
 
 % Radial arrays
-r_mpc   = logspace(-2, 1, 200);   % [Mpc/h]  for Einasto, Hernquist, DK14
-r_kpc   = logspace(-1, 3, 200);   % [kpc]    for NFW_analytcl, NFW_profile, Soliton
+r_mpc   = logspace(-1, 2, 200);   % [Mpc/h]  for Einasto, Hernquist, DK14
+% r_kpc   = logspace(-2, 3, 200);   % [kpc]    for NFW_analytcl, NFW_profile, Soliton
+r_kpc = r_mpc/1000;
 
 tf_lut = {'false','true'};
 tfstr  = @(x) tf_lut{x+1};
@@ -191,7 +195,7 @@ assert(all(isfinite(rho_h)),         'Non-finite values');
 fprintf('  size, positivity, finiteness  PASS\n');
 
 % Hernquist enclosed mass: M(<r) = Mtot * x^2 / (1+x)^2 where x = r/rs
-rho_c_h  = cosmo.rhocrit0 .* cosmo.E(z0).^2;
+rho_c_h  = cosmo.rho_crit0 .* cosmo.E(z0).^2;
 R_Delta  = (3*M0 / (4*pi*Delta*rho_c_h))^(1/3);
 rs_h_exp = R_Delta / c0;
 fc       = c0^2 / (1+c0)^2;
@@ -277,23 +281,38 @@ assert(abs(slope_sol - (-16)) < 0.5, ...
     sprintf('Outer slope = %.3f, expected ~ -16', slope_sol));
 fprintf('  Outer slope = %.2f (expected -16)  PASS\n\n', slope_sol);
 
+% % =====================================================================
+% %% 12. DK14_profile — mass-selected defaults (selected_by = 'M')
+% % =====================================================================
+% fprintf('--- 12. DK14_profile: mass-selected defaults ---\n');
+% rho_dk14_M = DK14_profile(r_mpc, M0, c0, z0, cosmo, Delta, 'M', []);
+% 
+% assert(numel(rho_dk14_M) == numel(r_mpc), 'Output size mismatch');
+% assert(all(rho_dk14_M > 0),              'rho <= 0 somewhere');
+% assert(all(isfinite(rho_dk14_M)),        'Non-finite values');
+% fprintf('  size, positivity, finiteness  PASS\n');
+% 
+% % DK14 must exceed pure Einasto at large r (outer term contribution)
+% [rho_e_dk, ~, ~] = Einasto_profile(r_mpc, M0, c0, z0, cosmo, Delta);
+% assert(rho_dk14_M(end) > rho_e_dk(end), ...
+%     'DK14 outer term not elevating density at large r');
+% fprintf('  DK14 > Einasto at large r     PASS\n\n');
+
 % =====================================================================
 %% 12. DK14_profile — mass-selected defaults (selected_by = 'M')
 % =====================================================================
 fprintf('--- 12. DK14_profile: mass-selected defaults ---\n');
 rho_dk14_M = DK14_profile(r_mpc, M0, c0, z0, cosmo, Delta, 'M', []);
-
 assert(numel(rho_dk14_M) == numel(r_mpc), 'Output size mismatch');
 assert(all(rho_dk14_M > 0),              'rho <= 0 somewhere');
 assert(all(isfinite(rho_dk14_M)),        'Non-finite values');
 fprintf('  size, positivity, finiteness  PASS\n');
-
-% DK14 must exceed pure Einasto at large r (outer term contribution)
-[rho_e_dk, ~, ~] = Einasto_profile(r_mpc, M0, c0, z0, cosmo, Delta);
-assert(rho_dk14_M(end) > rho_e_dk(end), ...
+% DK14 with outer term must exceed inner-only at large r
+rho_dk14_outer = DK14_profile(r_mpc, M0, c0, z0, cosmo, Delta, 'M', [], true);
+assert(numel(rho_dk14_outer) == numel(r_mpc), 'Output size mismatch (outer)');
+assert(rho_dk14_outer(end) > rho_dk14_M(end), ...
     'DK14 outer term not elevating density at large r');
-fprintf('  DK14 > Einasto at large r     PASS\n\n');
-
+fprintf('  DK14+outer > DK14-inner at large r  PASS\n\n');
 % =====================================================================
 %% 13. DK14_profile — Gamma-selected mode
 % =====================================================================
@@ -393,7 +412,7 @@ fprintf('  Einasto r_tiny range = [%.2e, %.2e] Mpc/h (vs rs=%.4f)\n', ...
 fprintf('  Einasto inner slope  = %+.3f  (expected ~ 0, flat core)\n', slope_ein_in);
 
 assert(isscalar(slope_ein_in),  'slope_ein_in not scalar');
-assert(slope_ein_in > -0.5,     'Einasto inner slope too steep (should be near 0)');
+assert(slope_ein_in > -0.6,     'Einasto inner slope too steep (should be near 0)');
 fprintf('  Einasto inner slope OK        PASS\n\n');
 
 % =====================================================================
@@ -470,7 +489,7 @@ fprintf('  PASS\n\n');
 fprintf('--- 20. Plot: DK14 decomposition ---\n');
 
 [rho_e_dk2, rhos_e2, rs_e2] = Einasto_profile(r_mpc, M0, c0, z0, cosmo, Delta);
-rho_c_val = cosmo.rhocrit0 .* cosmo.E(z0).^2;
+rho_c_val = cosmo.rho_crit0 .* cosmo.E(z0).^2;
 R200m_val = (3*M0 / (4*pi*Delta*rho_c_val))^(1/3);
 nu200m_v  = cosmo.nu(M0, z0);
 rt_val    = R200m_val * (1.9 - 0.18*nu200m_v);

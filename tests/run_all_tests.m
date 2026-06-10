@@ -6,7 +6,7 @@
 %   >> cd F:\PHANTOM\tests
 %   >> run_all_tests
 
-clc;
+clear; clc; close all;
 
 TESTS_DIR = fileparts(mfilename('fullpath'));
 
@@ -25,6 +25,8 @@ test_files = {
     'test_klypin16'
     'test_ludlow16'
     'test_profiles'
+    'test_chmr'
+    'test_halo_bias'
 };
 
 n         = numel(test_files);

@@ -14,7 +14,7 @@ addpath(genpath(utils_path));
 addpath(genpath(concentration_path));
 
 assert(exist('Ishiyama21', 'file') == 2, ...
-    sprintf('Ishiyama21.m not found.\nExpected in: %s', utils_path));
+    sprintf('Ishiyama21.m not found.\nExpected in: %s', concentration_path));
 assert(exist('Ishiyama21_Table', 'file') == 2, ...
     sprintf('Ishiyama21_Table.m not found.\nExpected in: %s', utils_path));
 
