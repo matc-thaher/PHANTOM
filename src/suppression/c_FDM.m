@@ -126,11 +126,11 @@ simple_models = { 'duffy08', 'd08', ...
 
 % --- suppression model (arg 1) ---
 if numel(varargin) >= 1 && (ischar(varargin{1}) || isstring(varargin{1})) && ...
-        any(strcmpi(varargin{1}, {'laroche2022','dentler2022'}))
+        any(strcmpi(varargin{1}, {'laroche2022','laroche22','dentler2022','dentler22'}))
     sup_model = varargin{1};
-    varargin  = varargin(2:end);          % consume
+    varargin  = varargin(2:end);
 else
-    sup_model = 'laroche2022';            % default
+    sup_model = 'laroche22';   % update default to match suppression_factor.m
 end
 % --- CDM model (arg 2, now arg 1 of remaining) ---
 if numel(varargin) >= 1 && (ischar(varargin{1}) || isstring(varargin{1})) && ...
@@ -158,7 +158,7 @@ end
 %   M_half = 3.8e10 * m22^(-4/3)  [M_sun]
 %   where m22 = m_ax / 1e-22 eV
 % -------------------------------------------------------------------------
-m22    = m_ax ; %/ 1e-22;
+m22    = m_ax / 1e-22;
 M_half = 3.8e10 * m22^(-4/3);           % [M_sun]
 
 % -------------------------------------------------------------------------

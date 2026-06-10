@@ -231,7 +231,7 @@ function b = halo_bias(model, sigma, delta_c, varargin)
                 delta_c = collapse_overdensity();   % CDM fallback
             end
 
-            b = halo_bias_Tinker10(sigma, delta_c, Delta, z, cosmo);
+            b = halo_bias_SMT01(sigma, delta_c, Delta, z, cosmo);
 
         % ----------------------------------------------------------
         % Unknown model key

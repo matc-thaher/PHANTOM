@@ -1,12 +1,17 @@
-function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
+function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma, include_outer)
 % DK14_profile  Diemer & Kravtsov (2014) density profile
 %
+%   rho = DK14_profile(r, M, c, z, cosmo, Delta)
+%   rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by)
 %   rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
+%   rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma, include_outer)
 %
 %   The DK14 profile multiplies an Einasto inner profile by a truncation
-%   (splashback) function and adds a power-law outer (infalling) term:
+%   (splashback) function and optionally adds a power-law outer term:
 %
-%     rho(r) = rho_inner(r) * f_trans(r) + rho_outer(r)
+%     rho(r) = rho_inner(r) * f_trans(r)              [default]
+%     rho(r) = rho_inner(r) * f_trans(r) + rho_outer  [include_outer = true]
+%
 %
 %   where
 %     rho_inner(r) : Einasto profile via Einasto_profile.m
@@ -32,22 +37,23 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
 %       rho_m = cosmo.rho_m0 * (1+z)^3  (mean matter density at z)
 %
 %   INPUTS
-%   r           : radii [Mpc/h], scalar or vector
-%   M           : halo mass [Msun/h]  (as M_200m)
-%   c           : concentration c_200m = R_200m / r_s
-%   z           : redshift
-%   cosmo       : cosmology struct with fields:
-%                   .rhocrit0   critical density at z=0 [Msun/h/(Mpc/h)^3]
-%                   .E(z)       E(z) = H(z)/H0 function handle
-%                   .nu(M,z)    peak-height nu(M,z) function handle
-%                   .Omega_m    matter density parameter (for rho_m0)
-%                   .rho_m0     mean matter density at z=0 [Msun/h/(Mpc/h)^3]
-%   Delta       : overdensity w.r.t. critical density (typically 200)
-%   selected_by : (optional) 'M' [default] or 'Gamma'
-%                   'M'     -> sample selected by mass only
-%                   'Gamma' -> sample selected by mass AND accretion rate
-%   Gamma       : (optional) mass accretion rate as in DK14
-%                   Required (and used) only when selected_by = 'Gamma'
+%   r             : radii [Mpc/h], scalar or vector
+%   M             : halo mass [Msun/h]  (as M_200m)
+%   c             : concentration c_200m
+%   z             : redshift
+%   cosmo         : cosmology struct with fields:
+%                     .rho_m0     mean matter density at z=0 [Msun/h/(Mpc/h)^3]
+%                     .rhocrit0   critical density at z=0    [Msun/h/(Mpc/h)^3]
+%                     .E(z)       E(z) = H(z)/H0 function handle
+%                     .nu(M,z)    peak-height function handle
+%                     .Omega_m    matter density parameter
+%   Delta         : overdensity w.r.t. critical (typically 200)
+%   selected_by   : (optional) 'M' [default] or 'Gamma'
+%   Gamma         : (optional) mass accretion rate — only used when
+%                     selected_by = 'Gamma'
+%   include_outer : (optional) logical, default false
+%                     false -> inner * f_trans only  (matches bare Colossus DK14Profile)
+%                     true  -> inner * f_trans + rho_outer
 %
 %   OUTPUT
 %   rho         : total DK14 density at each r [Msun/h / (Mpc/h)^3]
@@ -69,6 +75,9 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     if nargin < 8
         Gamma = [];
     end
+    if nargin < 9 || isempty(include_outer)
+        include_outer = false;
+    end
 
     % If selected_by = 'Gamma' but no Gamma value supplied,
     % fall back silently to mass-selected defaults instead of erroring.
@@ -82,17 +91,7 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     % ---- Mean matter density at z ---------------------------------------
     rho_m_z  = cosmo.rhom(z);          % mean matter density at z
 
-    % ---- R_200m and nu_200m  --------------------------------------------
-    % Needed to calibrate rt (DK14 eq. 6 was calibrated for nu_200m).
-    % R_200m is computed as the overdensity radius at Delta = 200 w.r.t.
-    % critical, consistent with M being M_200m.
-    % rho_c    = cosmo.rhocrit(z); %cosmo.rho_crit0 .* cosmo.E(z).^2;
-    % R200m    = (3 .* M ./ (4 .* pi .* Delta .* rho_c)).^(1/3);
-    % R200m    = (3 .* M ./ (4 .* pi .* 200 .* rho_m_z)).^(1/3);   % true R200m
-
-    % M200m approximation for nu calibration (DK14 eq.6 uses nu_200m)
-    % M200m_approx = M .* (rho_m_z ./ rho_c);
-    % Exact M200c -> M200m conversion via NFW profile (no Colossus needed)
+    % M200m, R200m, nu200m approximation for nu calibration (DK14 eq.6 uses nu_200m)
     [M200m, R200m, ~] = change_mass_definition(M, c, z, Delta, 'c', 200, 'm', cosmo);
     nu200m            = cosmo.nu(M200m, z);    % peak height at M_200m
 
@@ -121,14 +120,9 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     % Numerical safety: rt must be positive
     rt = max(rt, 0.01 .* R200m);
 
-    % ---- Outer power-law slope default ----------------------------------
-    s_e = 1.5;
-
     % ---- Inner Einasto profile  (delegates to Einasto_profile.m) --------
     % alpha_e is computed inside via Gao+2008: alpha_e = 0.155+0.0095*nu^2
     [rho_inner, ~, ~] = Einasto_profile(r, M, c, z, cosmo, Delta);
-    % Inside DK14_profile.m, replace the Einasto call with:
-    % [rho_inner, ~, ~] = Einasto_profile(r, M200m, c_new, z, cosmo, 200, '200m');
 
     % ---- Truncation (splashback) function --------------------------------
     % f_trans(r) = [ 1 + (r/rt)^beta ]^(-gamma_t/beta)
@@ -137,13 +131,14 @@ function rho = DK14_profile(r, M, c, z, cosmo, Delta, selected_by, Gamma)
     %   r >> rt : f_trans -> 0       (sharp suppression)
     f_trans = (1 + (r ./ rt).^beta).^(-gamma_t ./ beta);
 
-    % % ---- Outer power-law (infalling) term --------------------------------
-    % % rho_outer = rho_m * (r)^(-s_e)
-    % % b_e * r_ref^s_e are absorbed into rho_m by convention (b_e ~ 1,
-    % % r_ref = 1 Mpc/h so the factor is unity in these units).
-    % rho_outer = rho_m .* (r).^(-s_e);
-
     % ---- Total DK14 profile ---------------------------------------------
-    rho = rho_inner .* f_trans; % + rho_outer;
+    if include_outer
+        b_e       = 1.0;
+        s_e       = 1.5;
+        rho_outer = b_e .* rho_m_z .* (r ./ R200m).^(-s_e);
+        rho       = rho_inner .* f_trans + rho_outer;
+    else
+        rho       = rho_inner .* f_trans;
+    end
 
 end

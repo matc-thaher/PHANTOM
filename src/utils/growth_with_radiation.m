@@ -5,7 +5,7 @@ function D = growth_with_radiation(z, cosmo)
 
     % Note: Ez_D uses radiation as constant (not (1+z)^4) to avoid divergence
     % at high-z in the integral — same approach as Colossus
-    Ez_D      = @(zp) sqrt(cosmo.Omega_m.*(1+zp).^3 + cosmo.Omega_L + (cosmo.Omega_r);
+    Ez_D      = @(zp) sqrt(cosmo.Omega_m.*(1+zp).^3 + cosmo.Omega_L + (cosmo.Omega_r));
     integrand = @(zp) (1+zp) ./ Ez_D(zp).^3;
 
     % Gnedin+2011 Eq.5 — matter-radiation regime analytic approximation

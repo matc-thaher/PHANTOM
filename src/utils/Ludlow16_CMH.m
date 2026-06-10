@@ -1,4 +1,4 @@
-function Mcoll = Ludlow16_CMH(z, M0, f, cosmo)
+function Mcoll = Ludlow16_CMH(z, M0, f, cosmo, normalise)
 % Ludlow16_CMH  Collapsed Mass History from EPS theory
 %
 %   Mcoll = Ludlow16_CMH(z, M0, f, cosmo)
@@ -26,6 +26,10 @@ function Mcoll = Ludlow16_CMH(z, M0, f, cosmo)
 %
 %   Reference: Ludlow et al. 2016, MNRAS 460, 1214, eq.(3)
 
+    if nargin < 5 || isempty(normalise)
+        normalise = false;   % default: no M0 multiplication (current behaviour)
+    end
+
     delta_sc0 = 1.686;                        % collapse threshold (footnote 4)
 
     % D0 = growth_factor_D(0, cosmo);
@@ -42,5 +46,9 @@ function Mcoll = Ludlow16_CMH(z, M0, f, cosmo)
     denom     = sqrt(2 * (sigma_fM0^2 - sigma_M0^2));
     arg       = (deltaz - delta0) ./ denom;
 
-    Mcoll     =  erfc(arg); % M0 .*
+    if normalise
+        Mcoll = M0 .* erfc(arg);
+    else
+        Mcoll = erfc(arg);
+    end
 end
