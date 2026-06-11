@@ -152,8 +152,7 @@ For the core-halo mass relation introduced in this package, also cite:
 ## Contributing & Issues
 
 Found a bug or want to request a feature?
-→ Open an [Issue](https://github.com/matc-thaher/PHANTOM/issues) or see
-[CONTRIBUTING.md](https://github.com/matc-thaher/PHANTOM/blob/main/CONTRIBUTING.md).
+→ | [Contributing](Contributing) | How to contribute, report bugs, and submit pull requests |
 
 ***
 

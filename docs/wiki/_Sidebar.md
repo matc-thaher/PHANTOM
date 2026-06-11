@@ -8,6 +8,7 @@
 <summary><b>Getting Started</b></summary>
 
 - [Installation](Installation)
+- [Contributing](Contributing)
 
 </details>
 
