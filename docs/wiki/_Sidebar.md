@@ -5,6 +5,15 @@
 ---
 
 <details>
+<summary><b>Getting Started</b></summary>
+
+- [Installation](Installation)
+
+</details>
+
+---
+
+<details>
 <summary><b>Halo Profiles</b></summary>
 
 - [Halo Profiles](Halo-Profile)
@@ -20,7 +29,7 @@
 ---
 
 <details>
-<summary><b>Concentration</b></summary>
+<summary><b>Concentration–Mass Relations</b></summary>
 
 - [Concentration](Concentration)
   - [c_CDM (Dispatcher)](c_CDM)
@@ -43,8 +52,31 @@
 ---
 
 <details>
-<summary><b>Utilities</b></summary>
+<summary><b>FDM & Soliton Physics</b></summary>
 
-- [Coming soon]
+- [FDM Soliton Physics](FDM-Soliton)
+- [Suppression Functions](Suppression-Functions)
 
 </details>
+
+---
+
+<details>
+<summary><b>Utilities</b></summary>
+
+- [Cosmological Utilities](Cosmological-Utilities)
+
+</details>
+
+---
+
+<details>
+<summary><b>Compatibility</b></summary>
+
+- [Octave Compatibility](Octave-Compatibility)
+
+</details>
+
+---
+
+> 📌 Wiki in active development

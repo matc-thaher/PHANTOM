@@ -62,51 +62,14 @@ c_B01 = Bullock01(M200c, z, cosmo);
 T = suppression_factor(cosmo);
 ```
 
-→ See **[Installation](Installation)** for full setup instructions.
 
 ***
-
 ## Installation
 
-### Option 1: Clone and add path *(recommended for development)*
+PHANTOM is available for **MATLAB**, **GNU Octave**, and **Python** (coming soon).
+See the **[Installation Guide](Installation)** for full setup instructions.
 
-```bash
-git clone https://github.com/matc-thaher/PHANTOM.git
-```
 
-Then in MATLAB:
-
-```matlab
-addpath(genpath('PHANTOM'))
-```
-
-> **Tip:** To make this permanent across sessions, add the line above to your
-> [`startup.m`](https://www.mathworks.com/help/matlab/ref/startup.html) file.
-> Run `edit startup.m` in MATLAB to open or create it.
-
-### Option 2: Install via `.mltbx` *(recommended for users)*
-
-1. Download [`PHANTOM.mltbx`](https://github.com/matc-thaher/PHANTOM/releases/download/V1.0/PHANTOM.mltbx)
-   from the [Releases page](https://github.com/matc-thaher/PHANTOM/releases/latest)
-2. Double-click the file — MATLAB will install it automatically
-3. Verify installation in MATLAB:
-
-```matlab
-addons = matlab.addons.toolbox.installedToolboxes();
-disp({addons.Name})   % PHANTOM should appear in the list
-```
-
-### Verify Your Installation
-
-Whichever option you used, confirm everything works:
-
-```matlab
-cosmo = cosmology();          % should run without errors
-c     = Diemer15(1e12, 0, cosmo);
-fprintf('Concentration: %.4f\n', c)
-```
-
-If this prints a number without errors, PHANTOM is installed correctly.
 
 ***
 
