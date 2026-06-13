@@ -290,7 +290,11 @@ function c = get_concentration(M_h, hc, cosmo, z, opts)
     end
 
     % c_CDM expects M in [Msun/h]  —  divide by h
-    c = c_CDM(M_h / hc.h, z, model, cosmo);
+    if ~isempty(opts.mode)
+        c = c_CDM(M_h / hc.h, z, model, cosmo, opts.mode);
+    else
+        c = c_CDM(M_h / hc.h, z, model, cosmo);
+    end
     c = max(c, 2.0);   % numerical floor
 end
 
