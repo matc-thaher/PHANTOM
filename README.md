@@ -95,6 +95,40 @@ c_B01 = Bullock01(M200c, z, cosmo);
 T = suppression_factor(cosmo);
 ```
 
+---
+
+## WDM / FDM Cosmologies
+
+```matlab
+% Warm dark matter (Viel+2005)
+cosmo_wdm                = cosmology('Planck18');
+cosmo_wdm.transfer_model = 'viel05';
+cosmo_wdm.m_wdm_keV      = 3.0;
+cosmo_wdm = cosmology('custom', cosmo_wdm);
+
+% Fuzzy dark matter (Schive+2025)
+cosmo_fdm                = cosmology('Planck18');
+cosmo_fdm.transfer_model = 'schive25';
+cosmo_fdm.m22            = 1.0;   % m_a = 1e-22 eV
+cosmo_fdm = cosmology('custom', cosmo_fdm);
+```
+
+---
+
+## Extended Cosmologies
+
+```matlab
+% Include radiation species
+cosmo.relspecies = true;
+cosmo = cosmology('Planck18', cosmo);
+
+% CPL dark energy
+cosmo.de_model = 'w0wa';
+cosmo.w0       = -0.9;
+cosmo.wa       =  0.1;
+cosmo = cosmology('Planck18', cosmo);
+```
+
  
 ## Module Overview
 
