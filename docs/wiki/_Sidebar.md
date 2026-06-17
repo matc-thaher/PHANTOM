@@ -66,6 +66,39 @@
 <summary><b>Utilities</b></summary>
 
 - [Cosmological Utilities](Cosmological-Utilities)
+  - [cosmology](cosmology)
+  - [attach\_linear\_components](attach_linear_components)
+  - [derive\_cosmo\_params](derived_params)
+  - **Transfer Functions**
+    - [T\_EH98](transfer_functions#t_eh98----eisenstein--hu-1998-no-wiggle)
+    - [T\_EH98\_full](transfer_functions#t_eh98_full----eisenstein--hu-1998-full-baryon)
+    - [T\_Sugiyama95](transfer_functions#t_sugiyama95----sugiyama-1995)
+    - [T\_wdm](transfer_functions#t_wdm----warm-dark-matter-suppression)
+    - [T\_Schive25](transfer_functions#t_schive25----fuzzy-dark-matter-fdm)
+    - [CAMB Interface](transfer_functions#camb-interface)
+  - **Growth Factor**
+    - [growth\_factor\_D](growth_factor#growth_factor_d----flat-lcdm-default)
+    - [growth\_factor\_D\_ext](growth_factor#growth_factor_d_ext----dispatcher)
+    - [growth\_integral](growth_factor#growth_integral----heathe99-integral)
+    - [growth\_ODE](growth_factor#growth_ode----non-lcdm-dark-energy)
+    - [growth\_with\_radiation](growth_factor#growth_with_radiation----radiation-inclusive-growth)
+  - **Variance**
+    - [sigma\_R](variance#sigma_r----rms-variance-r-z)
+    - [sigma\_R2\_given\_Pk](variance#sigma_r2_given_pk----core-variance-integral)
+    - [variance\_window](variance#variance_window----fourier-window-functions)
+    - [normalize\_A\_to\_sigma8](variance#normalize_a_to_sigma8----power-spectrum-normalization)
+  - **Time & Distances**
+    - [z\_to\_time\_gyr](time_calculations)
+    - [comoving\_distance](distances#comoving_distance)
+    - [transverse\_comoving\_distance](distances#transverse_comoving_distance)
+  - **Collapse & Thresholds**
+    - [collapse\_overdensity](collapse_and_thresholds#collapse_overdensity)
+    - [collapse\_overdensity\_fdm](collapse_and_thresholds#collapse_overdensity_fdm)
+    - [delta\_vir\_bn98](collapse_and_thresholds#delta_vir_bn98----virial-overdensity)
+    - [density\_threshold](collapse_and_thresholds#density_threshold)
+    - [halfmode\_mass](collapse_and_thresholds#halfmode_mass)
+  - **Correlation Function**
+    - [correlation\_function](correlation_function)
 
 </details>
 
