@@ -149,7 +149,34 @@ All tests use the MATLAB unit testing framework. Output shows pass/fail for each
  
 ## Citation
 
-If you use PHANTOM in your research, please cite the software paper:
+If you use PHANTOM in your research, please cite both the software paper and the software release:
+
+**Software paper:**
+
+Abu Thaher Chowdhury, M. (2026). PHANTOM: A MATLAB and Octave Toolbox Connecting
+Linear Field Statistics to Dark Matter Halo Observables. *arXiv e-prints*, arXiv:2606.19104.
+[https://doi.org/10.48550/arXiv.2606.19104](https://doi.org/10.48550/arXiv.2606.19104)
+
+```bibtex
+@ARTICLE{2026arXiv260619104A,
+       author = {{Abu Thaher Chowdhury}, Mohammad},
+        title = "{PHANTOM: A MATLAB and Octave Toolbox Connecting Linear Field Statistics to Dark Matter Halo Observables}",
+      journal = {arXiv e-prints},
+     keywords = {Cosmology and Nongalactic Astrophysics, Instrumentation and Methods for Astrophysics},
+         year = 2026,
+        month = jun,
+          eid = {arXiv:2606.19104},
+        pages = {arXiv:2606.19104},
+          doi = {10.48550/arXiv.2606.19104},
+archivePrefix = {arXiv},
+       eprint = {2606.19104},
+ primaryClass = {astro-ph.CO},
+       adsurl = {https://ui.adsabs.harvard.edu/abs/2026arXiv260619104A},
+      adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+```
+
+**Software release:**
 
 Chowdhury, Mohammad Abu Thaher. (2026). *PHANTOM: Profile and Halo Analysis for
 Numerous Theoretical dark Matter Observables*. Zenodo.
@@ -166,6 +193,10 @@ Numerous Theoretical dark Matter Observables*. Zenodo.
   url       = {https://doi.org/10.5281/zenodo.19700919}
 }
 ```
+
+For the core-halo mass relation introduced in this package, also cite:
+
+> Chowdhury, Mohammad Abu Thaher et al. (in prep.). [Core-halo mass relation paper title].
 
 For the core-halo mass relation introduced in this package, also cite:
 
